@@ -55,6 +55,66 @@
       padding: 0 3px;
       margin-left: 1px;
     }
+    .calc-key {
+      min-height: 2.75rem;
+      border: 1px solid rgb(226 232 240);
+      border-radius: 0.75rem;
+      background: rgb(248 250 252);
+      color: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: background-color 150ms, border-color 150ms;
+    }
+    .calc-key:hover {
+      border-color: rgb(165 180 252);
+      background: rgb(238 242 255);
+    }
+    .dark .calc-key {
+      border-color: rgb(51 65 85);
+      background: rgb(30 41 59);
+    }
+    .dark .calc-key:hover {
+      border-color: rgb(99 102 241);
+      background: rgb(49 46 129);
+    }
+    .calc-key-primary,
+    .dark .calc-key-primary {
+      border-color: rgb(79 70 229);
+      background: rgb(79 70 229);
+      color: white;
+    }
+    .calc-key-primary:hover,
+    .dark .calc-key-primary:hover {
+      border-color: rgb(99 102 241);
+      background: rgb(99 102 241);
+    }
+    .calc-key:focus-visible {
+      outline: 2px solid rgb(99 102 241);
+      outline-offset: 2px;
+    }
+    .calculator-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      overflow-y: auto;
+      padding: 1rem;
+      background: rgba(15, 23, 42, 0.72);
+    }
+    .calculator-overlay-panel {
+      width: 100%;
+      max-width: 64rem;
+      margin: auto;
+      padding: 1.25rem;
+      border-radius: 1rem;
+      background: white;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    }
+    .dark .calculator-overlay-panel {
+      background: rgb(15 23 42);
+    }
     /* Subtle custom scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
@@ -106,6 +166,9 @@
         <button data-tab="diagnostics" class="tab-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center justify-center gap-1.5">
           <span>Problem Areas</span>
           <span id="weakBadge" class="hidden px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-rose-500 text-white">0</span>
+        </button>
+        <button data-tab="calculator" class="tab-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all">
+          Calculator
         </button>
       </nav>
 
@@ -267,6 +330,9 @@
                   </svg>
                   <span id="hintBtnText">Show Step-by-Step Hint</span>
                 </button>
+                <button id="openCalculatorBtn" class="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-medium transition-all">
+                  Calculator
+                </button>
                 <button id="openTopicFormulaBtn" class="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-medium transition-all">
                   Formula Sheet
                 </button>
@@ -311,7 +377,97 @@
         </section>
 
         <!-- ========================================================= -->
-        <!-- VIEW 2: STUDY GUIDE & FORMULA REFERENCE                   -->
+        <!-- VIEW 2: CALCULATOR TOOLS                                  -->
+        <!-- ========================================================= -->
+        <section id="calculatorView" class="hidden space-y-6">
+          <div id="calculatorOverlayPanel">
+            <div class="flex items-start justify-between gap-4 mb-5">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Calculator Tools</span>
+                <h2 id="calculatorHeading" class="text-xl sm:text-2xl font-bold mt-0.5">Scientific Calculator</h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Calculate expressions here, or open official TI calculator tools.</p>
+              </div>
+              <button id="closeCalculatorOverlayBtn" type="button" class="hidden flex-shrink-0 p-2 rounded-lg text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Close calculator">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold">Scientific Calculator</h3>
+                <button id="calculatorAngleModeBtn" type="button" class="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-xs font-bold" aria-label="Angle mode: degrees">
+                  DEG
+                </button>
+              </div>
+              <label for="calculatorDisplay" class="sr-only">Calculator expression and result</label>
+              <input id="calculatorDisplay" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="Enter an expression" class="w-full px-4 py-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-right text-xl sm:text-2xl font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500" aria-describedby="calculatorStatus">
+              <p id="calculatorStatus" class="min-h-5 mt-1.5 text-xs text-rose-600 dark:text-rose-400" aria-live="polite"></p>
+
+              <div id="calculatorKeys" class="grid grid-cols-4 gap-2 mt-3">
+                <button type="button" data-calculator-action="clear" class="calc-key">AC</button>
+                <button type="button" data-calculator-action="delete" class="calc-key">DEL</button>
+                <button type="button" data-calculator-insert="(" class="calc-key">(</button>
+                <button type="button" data-calculator-insert=")" class="calc-key">)</button>
+                <button type="button" data-calculator-insert="sin(" class="calc-key">sin</button>
+                <button type="button" data-calculator-insert="cos(" class="calc-key">cos</button>
+                <button type="button" data-calculator-insert="tan(" class="calc-key">tan</button>
+                <button type="button" data-calculator-insert="sqrt(" class="calc-key">√</button>
+                <button type="button" data-calculator-insert="asin(" class="calc-key">sin⁻¹</button>
+                <button type="button" data-calculator-insert="acos(" class="calc-key">cos⁻¹</button>
+                <button type="button" data-calculator-insert="atan(" class="calc-key">tan⁻¹</button>
+                <button type="button" data-calculator-insert="^2" class="calc-key">x²</button>
+                <button type="button" data-calculator-insert="ln(" class="calc-key">ln</button>
+                <button type="button" data-calculator-insert="log(" class="calc-key">log</button>
+                <button type="button" data-calculator-insert="abs(" class="calc-key">abs</button>
+                <button type="button" data-calculator-insert="^" class="calc-key">xʸ</button>
+                <button type="button" data-calculator-insert="7" class="calc-key">7</button>
+                <button type="button" data-calculator-insert="8" class="calc-key">8</button>
+                <button type="button" data-calculator-insert="9" class="calc-key">9</button>
+                <button type="button" data-calculator-insert="/" class="calc-key">÷</button>
+                <button type="button" data-calculator-insert="4" class="calc-key">4</button>
+                <button type="button" data-calculator-insert="5" class="calc-key">5</button>
+                <button type="button" data-calculator-insert="6" class="calc-key">6</button>
+                <button type="button" data-calculator-insert="*" class="calc-key">×</button>
+                <button type="button" data-calculator-insert="1" class="calc-key">1</button>
+                <button type="button" data-calculator-insert="2" class="calc-key">2</button>
+                <button type="button" data-calculator-insert="3" class="calc-key">3</button>
+                <button type="button" data-calculator-insert="-" class="calc-key">−</button>
+                <button type="button" data-calculator-insert="0" class="calc-key">0</button>
+                <button type="button" data-calculator-insert="." class="calc-key">.</button>
+                <button type="button" data-calculator-insert="pi" class="calc-key">π</button>
+                <button type="button" data-calculator-insert="+" class="calc-key">+</button>
+                <button type="button" data-calculator-insert="e" class="calc-key">e</button>
+                <button type="button" data-calculator-action="calculate" class="calc-key calc-key-primary col-span-3">=</button>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-3">Supports keyboard input, parentheses, powers, and standard trig/log functions. Trig uses degrees by default; tap DEG to switch to radians.</p>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm">
+              <h3 class="font-bold text-lg">TI-84 Plus CE Python</h3>
+              <p class="text-sm text-slate-600 dark:text-slate-300 mt-2">For the TI-84 Plus CE Python calculator experience, use Texas Instruments' official software and online calculator.</p>
+              <div class="space-y-3 mt-5">
+                <a href="https://education.ti.com/en/products/computer-software/ti-smartview-ce-for-84" target="_blank" rel="noopener noreferrer" class="block p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition-colors">
+                  <span class="block text-sm font-semibold text-indigo-700 dark:text-indigo-300">TI-SmartView CE emulator ↗</span>
+                  <span class="block text-xs text-slate-500 dark:text-slate-400 mt-1">Official TI emulator software for the TI-84 Plus CE family. Check TI for availability and licensing.</span>
+                </a>
+                <a href="https://84plusce.ti.com/" target="_blank" rel="noopener noreferrer" class="block p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition-colors">
+                  <span class="block text-sm font-semibold text-indigo-700 dark:text-indigo-300">TI-84 Plus CE online calculator ↗</span>
+                  <span class="block text-xs text-slate-500 dark:text-slate-400 mt-1">Browser-based TI calculator; TI sign-in or a license may be required. Python programming is available on the Python-edition handheld, not this online calculator.</span>
+                </a>
+                <a href="https://education.ti.com/en/products/calculators/graphing-calculators/ti-84-plus-ce-python" target="_blank" rel="noopener noreferrer" class="inline-flex text-sm font-semibold text-indigo-700 dark:text-indigo-300 underline underline-offset-2 hover:no-underline">
+                  TI-84 Plus CE Python product details ↗
+                </a>
+              </div>
+            </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- VIEW 3: STUDY GUIDE & FORMULA REFERENCE                   -->
         <!-- ========================================================= -->
         <section id="studyView" class="hidden space-y-6">
           <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -347,7 +503,7 @@
         </section>
 
         <!-- ========================================================= -->
-        <!-- VIEW 3: WEAKNESS & PROBLEM AREAS DASHBOARD                -->
+        <!-- VIEW 4: WEAKNESS & PROBLEM AREAS DASHBOARD                -->
         <!-- ========================================================= -->
         <section id="diagnosticsView" class="hidden space-y-6">
           <!-- Top Summary Cards -->
@@ -1373,10 +1529,13 @@
       }
 
       let stats = loadStats();
-      let activeTab = 'practice'; // 'practice' | 'study' | 'diagnostics'
+      let activeTab = 'practice'; // 'practice' | 'study' | 'diagnostics' | 'calculator'
       let activeTopicId = MODULES[0].id;
       let isWeaknessDrillMode = false;
       let answerMode = 'mc'; // 'mc' | 'input'
+      let calculatorAngleMode = 'DEG';
+      let calculatorOverlayOpen = false;
+      let calculatorOverlayOpener = null;
       let currentProblem = null;
       let currentProblemTopicId = MODULES[0].id;
       let problemAnswered = false;
@@ -1396,6 +1555,14 @@
       const practiceView = document.getElementById('practiceView');
       const studyView = document.getElementById('studyView');
       const diagnosticsView = document.getElementById('diagnosticsView');
+      const calculatorView = document.getElementById('calculatorView');
+      const calculatorDisplay = document.getElementById('calculatorDisplay');
+      const calculatorStatus = document.getElementById('calculatorStatus');
+      const calculatorKeys = document.getElementById('calculatorKeys');
+      const calculatorAngleModeBtn = document.getElementById('calculatorAngleModeBtn');
+      const calculatorOverlayPanel = document.getElementById('calculatorOverlayPanel');
+      const openCalculatorBtn = document.getElementById('openCalculatorBtn');
+      const closeCalculatorOverlayBtn = document.getElementById('closeCalculatorOverlayBtn');
 
       // Practice View Elements
       const practiceModeTag = document.getElementById('practiceModeTag');
@@ -1839,7 +2006,39 @@
       // =========================================================================
       // 7. NAVIGATION & EVENT LISTENERS
       // =========================================================================
+      function openCalculatorOverlay() {
+        calculatorOverlayOpener = openCalculatorBtn;
+        calculatorOverlayOpen = true;
+        calculatorView.classList.remove('hidden');
+        calculatorView.classList.add('calculator-overlay');
+        calculatorOverlayPanel.classList.add('calculator-overlay-panel');
+        closeCalculatorOverlayBtn.classList.remove('hidden');
+        calculatorView.setAttribute('role', 'dialog');
+        calculatorView.setAttribute('aria-modal', 'true');
+        calculatorView.setAttribute('aria-labelledby', 'calculatorHeading');
+        document.body.classList.add('overflow-hidden');
+        calculatorDisplay.focus();
+      }
+
+      function closeCalculatorOverlay() {
+        if (!calculatorOverlayOpen) return;
+        calculatorOverlayOpen = false;
+        calculatorView.classList.remove('calculator-overlay');
+        calculatorOverlayPanel.classList.remove('calculator-overlay-panel');
+        closeCalculatorOverlayBtn.classList.add('hidden');
+        calculatorView.removeAttribute('role');
+        calculatorView.removeAttribute('aria-modal');
+        calculatorView.removeAttribute('aria-labelledby');
+        document.body.classList.remove('overflow-hidden');
+        if (activeTab !== 'calculator') calculatorView.classList.add('hidden');
+
+        const opener = calculatorOverlayOpener;
+        calculatorOverlayOpener = null;
+        if (opener instanceof HTMLElement && opener.isConnected) opener.focus();
+      }
+
       function switchTab(tabName) {
+        if (calculatorOverlayOpen) closeCalculatorOverlay();
         activeTab = tabName;
 
         tabBtns.forEach((btn) => {
@@ -1852,6 +2051,7 @@
         practiceView.classList.toggle('hidden', tabName !== 'practice');
         studyView.classList.toggle('hidden', tabName !== 'study');
         diagnosticsView.classList.toggle('hidden', tabName !== 'diagnostics');
+        calculatorView.classList.toggle('hidden', tabName !== 'calculator');
 
         if (tabName === 'study') renderStudyGuide();
         if (tabName === 'diagnostics') renderDiagnostics();
@@ -1859,6 +2059,88 @@
 
       tabBtns.forEach((btn) => {
         btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+
+      openCalculatorBtn.addEventListener('click', openCalculatorOverlay);
+      closeCalculatorOverlayBtn.addEventListener('click', closeCalculatorOverlay);
+      calculatorView.addEventListener('click', (event) => {
+        if (calculatorOverlayOpen && event.target === calculatorView) closeCalculatorOverlay();
+      });
+      calculatorView.addEventListener('keydown', (event) => {
+        if (!calculatorOverlayOpen) return;
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          closeCalculatorOverlay();
+          return;
+        }
+        if (event.key !== 'Tab') return;
+
+        const focusableElements = calculatorView.querySelectorAll('button:not([disabled]), input:not([disabled]), a[href]');
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        if (event.shiftKey && document.activeElement === firstElement) {
+          event.preventDefault();
+          lastElement.focus();
+        } else if (!event.shiftKey && document.activeElement === lastElement) {
+          event.preventDefault();
+          firstElement.focus();
+        }
+      });
+
+      calculatorKeys.addEventListener('click', (event) => {
+        const button = event.target.closest('button');
+        if (!button) return;
+
+        const action = button.dataset.calculatorAction;
+        if (action === 'clear') {
+          calculatorDisplay.value = '';
+          calculatorStatus.textContent = '';
+          calculatorDisplay.focus();
+        } else if (action === 'delete') {
+          const start = calculatorDisplay.selectionStart ?? calculatorDisplay.value.length;
+          const end = calculatorDisplay.selectionEnd ?? calculatorDisplay.value.length;
+          const deleteStart = start === end ? Math.max(0, start - 1) : start;
+          calculatorDisplay.value = calculatorDisplay.value.slice(0, deleteStart) + calculatorDisplay.value.slice(end);
+          calculatorDisplay.setSelectionRange(deleteStart, deleteStart);
+          calculatorDisplay.focus();
+          calculatorStatus.textContent = '';
+        } else if (action === 'calculate') {
+          runScientificCalculation();
+          calculatorDisplay.focus();
+          const caret = calculatorDisplay.value.length;
+          calculatorDisplay.setSelectionRange(caret, caret);
+        } else if (button.dataset.calculatorInsert) {
+          const start = calculatorDisplay.selectionStart ?? calculatorDisplay.value.length;
+          const end = calculatorDisplay.selectionEnd ?? calculatorDisplay.value.length;
+          const insertion = button.dataset.calculatorInsert;
+          calculatorDisplay.value =
+            calculatorDisplay.value.slice(0, start) + insertion + calculatorDisplay.value.slice(end);
+          const caret = start + insertion.length;
+          calculatorDisplay.focus();
+          calculatorDisplay.setSelectionRange(caret, caret);
+          calculatorStatus.textContent = '';
+        }
+      });
+
+      calculatorDisplay.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          runScientificCalculation();
+        } else if (event.key === 'Escape') {
+          if (calculatorOverlayOpen) {
+            event.preventDefault();
+            closeCalculatorOverlay();
+          } else {
+            calculatorDisplay.value = '';
+            calculatorStatus.textContent = '';
+          }
+        }
+      });
+
+      calculatorAngleModeBtn.addEventListener('click', () => {
+        calculatorAngleMode = calculatorAngleMode === 'DEG' ? 'RAD' : 'DEG';
+        calculatorAngleModeBtn.textContent = calculatorAngleMode;
+        calculatorAngleModeBtn.setAttribute('aria-label', `Angle mode: ${calculatorAngleMode === 'DEG' ? 'degrees' : 'radians'}`);
       });
 
       // Hint Controls
@@ -1891,6 +2173,147 @@
         } else {
           nextHintStepBtn.classList.add('hidden');
           hintBtnText.textContent = 'All Hints Shown';
+        }
+      }
+
+      function evaluateScientificExpression(source) {
+        const expression = source
+          .replace(/[−–]/g, '-')
+          .replace(/×/g, '*')
+          .replace(/÷/g, '/')
+          .replace(/π/gi, 'pi')
+          .trim();
+        if (!expression) throw new Error('Enter an expression first.');
+
+        const tokenPattern = /\s*(?:\d+(?:\.\d*)?(?:[eE][+-]?\d+)?|\.\d+(?:[eE][+-]?\d+)?|[A-Za-z]+|[()+\-*/^])/y;
+        const tokens = [];
+        while (tokenPattern.lastIndex < expression.length) {
+          const match = tokenPattern.exec(expression);
+          if (!match) throw new Error('Check the expression for an unsupported character.');
+          tokens.push(match[0].trim());
+        }
+
+        let position = 0;
+        const peek = () => tokens[position];
+        const consume = () => tokens[position++];
+        const expect = (expected) => {
+          if (consume() !== expected) throw new Error(`Expected "${expected}".`);
+        };
+        const beginsImplicitFactor = (token) =>
+          token !== undefined && (token === '(' || /^[A-Za-z]+$/.test(token) || /^(?:\d|\.)/.test(token));
+
+        function parseExpression() {
+          let value = parseTerm();
+          while (peek() === '+' || peek() === '-') {
+            const operator = consume();
+            const right = parseTerm();
+            value = operator === '+' ? value + right : value - right;
+          }
+          return value;
+        }
+
+        function parseTerm() {
+          let value = parseUnary();
+          while (peek() === '*' || peek() === '/' || beginsImplicitFactor(peek())) {
+            if (peek() === '*') {
+              consume();
+              value *= parseUnary();
+            } else if (peek() === '/') {
+              consume();
+              value /= parseUnary();
+            } else {
+              value *= parseUnary();
+            }
+          }
+          return value;
+        }
+
+        function parseUnary() {
+          if (peek() === '+') {
+            consume();
+            return parseUnary();
+          }
+          if (peek() === '-') {
+            consume();
+            return -parseUnary();
+          }
+          return parsePower();
+        }
+
+        function parsePower() {
+          const base = parsePrimary();
+          if (peek() === '^') {
+            consume();
+            return Math.pow(base, parseUnary());
+          }
+          return base;
+        }
+
+        function parsePrimary() {
+          const token = consume();
+          if (token === undefined) throw new Error('The expression is incomplete.');
+          if (/^(?:\d|\.)/.test(token)) return Number(token);
+          if (token === '(') {
+            const value = parseExpression();
+            expect(')');
+            return value;
+          }
+          if (/^[A-Za-z]+$/.test(token)) {
+            const name = token.toLowerCase();
+            if (name === 'pi') return Math.PI;
+            if (name === 'e') return Math.E;
+            if (peek() !== '(') throw new Error(`Use ${name}(...) for a function.`);
+            consume();
+            const argument = parseExpression();
+            expect(')');
+            return applyCalculatorFunction(name, argument);
+          }
+          throw new Error(`Unexpected token "${token}".`);
+        }
+
+        const result = parseExpression();
+        if (position !== tokens.length) throw new Error(`Unexpected token "${peek()}".`);
+        if (!Number.isFinite(result)) throw new Error('The result is outside the calculator range.');
+        return result;
+      }
+
+      function applyCalculatorFunction(name, value) {
+        const toRadians = (angle) => calculatorAngleMode === 'DEG' ? angle * Math.PI / 180 : angle;
+        const fromRadians = (angle) => calculatorAngleMode === 'DEG' ? angle * 180 / Math.PI : angle;
+        switch (name) {
+          case 'sin': return Math.sin(toRadians(value));
+          case 'cos': return Math.cos(toRadians(value));
+          case 'tan': {
+            const radians = toRadians(value);
+            if (Math.abs(Math.cos(radians)) < 1e-12) throw new Error('Tangent is undefined at this angle.');
+            return Math.tan(radians);
+          }
+          case 'asin': return fromRadians(Math.asin(value));
+          case 'acos': return fromRadians(Math.acos(value));
+          case 'atan': return fromRadians(Math.atan(value));
+          case 'sqrt':
+            if (value < 0) throw new Error('Square root requires a non-negative number.');
+            return Math.sqrt(value);
+          case 'ln':
+            if (value <= 0) throw new Error('Natural log requires a positive number.');
+            return Math.log(value);
+          case 'log':
+            if (value <= 0) throw new Error('Log requires a positive number.');
+            return Math.log10(value);
+          case 'abs': return Math.abs(value);
+          default: throw new Error(`Unknown function "${name}".`);
+        }
+      }
+
+      function runScientificCalculation() {
+        try {
+          const result = evaluateScientificExpression(calculatorDisplay.value);
+          calculatorDisplay.value = Number.isInteger(result)
+            ? String(result)
+            : String(Number(result.toPrecision(10)));
+          calculatorStatus.textContent = '';
+        } catch (error) {
+          calculatorStatus.textContent = error instanceof Error ? error.message : 'Unable to evaluate this expression.';
         }
       }
 
