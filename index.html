@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AlgebraLab — College Algebra Study & Adaptive Practice</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            math: ['"Cambria Math"', '"Times New Roman"', 'serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Custom Fraction Styling for crisp math typography */
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 0.2em;
+      font-size: 0.92em;
+      line-height: 1.1;
+    }
+    .frac > span:first-child {
+      border-bottom: 1.5px solid currentColor;
+      padding: 0 0.25em 1px;
+    }
+    .frac > span:last-child {
+      padding: 1px 0.25em 0;
+    }
+    /* Square root radical styling */
+    .sqrt {
+      display: inline-flex;
+      align-items: center;
+      vertical-align: baseline;
+    }
+    .sqrt-radicand {
+      border-top: 1.5px solid currentColor;
+      padding: 0 3px;
+      margin-left: 1px;
+    }
+    /* Subtle custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.35);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.55);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200 min-h-screen flex flex-col">
+
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand & Mobile Menu Trigger -->
+      <div class="flex items-center gap-3">
+        <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Toggle Topics Sidebar">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-indigo-500/20">
+            ƒ(x)
+          </div>
+          <div>
+            <h1 class="font-bold text-base sm:text-lg tracking-tight leading-none">AlgebraLab</h1>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">College Algebra Adaptive Tutor</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Primary View Switcher Tabs -->
+      <nav class="flex items-center bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/70 dark:border-slate-700/60 order-3 sm:order-2 w-full sm:w-auto justify-between sm:justify-start">
+        <button data-tab="practice" class="tab-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm">
+          Practice Engine
+        </button>
+        <button data-tab="study" class="tab-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all">
+          Study & Formulas
+        </button>
+        <button data-tab="diagnostics" class="tab-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center justify-center gap-1.5">
+          <span>Problem Areas</span>
+          <span id="weakBadge" class="hidden px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-rose-500 text-white">0</span>
+        </button>
+      </nav>
+
+      <!-- Streak & Theme Toggle -->
+      <div class="flex items-center gap-2.5 order-2 sm:order-3">
+        <div class="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 text-amber-700 dark:text-amber-300 px-3 py-1.5 rounded-xl text-xs font-semibold" title="Current Correct Answer Streak">
+          <span>🔥</span>
+          <span id="streakCounter">0</span>
+          <span class="hidden md:inline">Streak</span>
+        </div>
+
+        <button id="themeToggleBtn" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" title="Toggle Light/Dark Mode">
+          <!-- Sun Icon -->
+          <svg id="sunIcon" class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          <!-- Moon Icon -->
+          <svg id="moonIcon" class="w-4 h-4 block dark:hidden text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace Layout -->
+  <div class="max-w-7xl mx-auto w-full flex-1 flex relative overflow-hidden">
+
+    <!-- Mobile Backdrop -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-slate-950/50 backdrop-blur-xs z-30 hidden lg:hidden"></div>
+
+    <!-- Left Sidebar: College Algebra Curriculum Modules -->
+    <aside id="topicsSidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 flex flex-col justify-between p-4 overflow-y-auto">
+      <div>
+        <div class="flex items-center justify-between mb-3 px-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Course Modules</span>
+          <button id="closeSidebarBtn" class="lg:hidden text-slate-400 hover:text-slate-600 dark:hover:text-white p-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Topic List Container -->
+        <div id="topicList" class="space-y-1.5">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+        <!-- Targeted Weakness Drill CTA -->
+        <div class="mt-6 p-3.5 rounded-2xl bg-gradient-to-br from-rose-500/10 via-amber-500/10 to-indigo-500/10 border border-rose-500/25 dark:border-rose-500/30">
+          <div class="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold text-xs uppercase tracking-wider">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Adaptive Focus
+          </div>
+          <p class="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
+            Automatically targets your lowest-scoring topics and recurring mistake patterns.
+          </p>
+          <button id="startWeaknessDrillBtn" class="mt-3 w-full py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-md shadow-rose-600/20 transition-all flex items-center justify-center gap-1.5">
+            <span>Targeted Weakness Drill</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Overall Mastery Summary Footer -->
+      <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 px-2">
+        <div class="flex justify-between items-center text-xs mb-1.5">
+          <span class="font-medium text-slate-500 dark:text-slate-400">Overall Course Mastery</span>
+          <span id="overallMasteryText" class="font-bold text-indigo-600 dark:text-indigo-400">0%</span>
+        </div>
+        <div class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div id="overallMasteryBar" class="h-full bg-indigo-600 dark:bg-indigo-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <div class="max-w-4xl mx-auto">
+
+        <!-- ========================================================= -->
+        <!-- VIEW 1: INTERACTIVE PRACTICE ENGINE                       -->
+        <!-- ========================================================= -->
+        <section id="practiceView" class="space-y-6">
+          <!-- Active Topic Banner -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:px-6 shadow-xs">
+            <div>
+              <div class="flex items-center gap-2">
+                <span id="practiceModeTag" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                  Topic Practice
+                </span>
+                <span id="problemSkillTag" class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  • Multi-Step Linear Equations
+                </span>
+              </div>
+              <h2 id="activeTopicTitle" class="text-lg sm:text-xl font-bold mt-1">Linear Equations & Inequalities</h2>
+            </div>
+
+            <!-- Answer Mode Switcher (Multiple Choice vs Direct Input) -->
+            <div class="flex items-center gap-2 self-start sm:self-center">
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Mode:</span>
+              <div class="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700">
+                <button id="modeMCBtn" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs transition-all">
+                  Multiple Choice
+                </button>
+                <button id="modeInputBtn" class="px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 transition-all">
+                  Direct Input
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Problem Card -->
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm">
+            <!-- Prompt & Math Expression -->
+            <div class="mb-6">
+              <p id="problemPrompt" class="text-sm sm:text-base font-medium text-slate-600 dark:text-slate-300 mb-3">
+                Solve for x:
+              </p>
+              <div id="problemExpression" class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-950/70 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 sm:p-6 text-center tracking-wide overflow-x-auto">
+                3(2x - 4) + 5 = 4x + 7
+              </div>
+            </div>
+
+            <!-- Multiple Choice Options Container -->
+            <div id="mcOptionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+              <!-- Populated dynamically -->
+            </div>
+
+            <!-- Direct Input Container -->
+            <div id="directInputContainer" class="hidden mb-6">
+              <label for="directAnswerInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                Your Answer <span id="inputFormatHint" class="normal-case font-normal text-slate-400">(e.g., 7 or -3/2)</span>
+              </label>
+              <div class="flex flex-col sm:flex-row gap-3">
+                <input
+                  id="directAnswerInput"
+                  type="text"
+                  autocomplete="off"
+                  placeholder="Type your final answer..."
+                  class="flex-1 px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-base font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <button id="submitDirectBtn" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-md shadow-indigo-600/20 transition-all">
+                  Check Answer
+                </button>
+              </div>
+            </div>
+
+            <!-- Action Controls: Hint & Next Question -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-2.5">
+                <button id="hintBtn" class="px-4 py-2 rounded-xl border border-amber-300 dark:border-amber-700/70 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                  </svg>
+                  <span id="hintBtnText">Show Step-by-Step Hint</span>
+                </button>
+                <button id="openTopicFormulaBtn" class="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs sm:text-sm font-medium transition-all">
+                  Formula Sheet
+                </button>
+              </div>
+
+              <button id="nextProblemBtn" class="px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-sm transition-all flex items-center gap-1.5">
+                <span>Next Problem</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Progressive Hint Box -->
+            <div id="hintBox" class="hidden mt-5 p-4 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Tutor Hint</span>
+                <button id="nextHintStepBtn" class="hidden text-xs font-semibold text-amber-700 dark:text-amber-300 underline hover:no-underline">
+                  Show Next Hint Step →
+                </button>
+              </div>
+              <div id="hintContent" class="space-y-1.5 text-sm text-slate-700 dark:text-slate-200"></div>
+            </div>
+
+            <!-- Instant Feedback & Worked Solution Box (Shown after answering) -->
+            <div id="solutionBox" class="hidden mt-6 rounded-2xl border p-5 transition-all">
+              <div class="flex items-start gap-3">
+                <div id="feedbackIcon" class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-base"></div>
+                <div class="flex-1">
+                  <h3 id="feedbackTitle" class="font-bold text-base">Correct!</h3>
+                  <p id="feedbackMistakeNote" class="text-xs sm:text-sm mt-1 font-medium"></p>
+
+                  <!-- Full Worked Solution -->
+                  <div class="mt-4 pt-3.5 border-t border-slate-200/70 dark:border-slate-700/70">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5">Complete Worked Solution</p>
+                    <ol id="workedStepsList" class="space-y-2 text-sm text-slate-700 dark:text-slate-200 list-decimal list-inside"></ol>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- VIEW 2: STUDY GUIDE & FORMULA REFERENCE                   -->
+        <!-- ========================================================= -->
+        <section id="studyView" class="hidden space-y-6">
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">High-Yield Reference</span>
+              <h2 id="studyTopicTitle" class="text-xl sm:text-2xl font-bold mt-0.5">Linear Equations & Inequalities</h2>
+              <p id="studyTopicSummary" class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Core formulas, algebraic properties, and worked examples for rapid review.
+              </p>
+            </div>
+            <button id="practiceThisTopicBtn" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-sm transition-all flex-shrink-0">
+              Practice This Topic →
+            </button>
+          </div>
+
+          <!-- Formula Cards Grid -->
+          <div id="formulaCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Populated dynamically -->
+          </div>
+
+          <!-- Common Pitfalls & Exam Tips -->
+          <div class="bg-amber-50/70 dark:bg-amber-950/25 border border-amber-200 dark:border-amber-800/50 rounded-2xl p-5 sm:p-6">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 flex items-center gap-2 mb-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+              Common Exam Mistakes to Watch Out For
+            </h3>
+            <ul id="studyPitfallsList" class="space-y-2 text-sm text-slate-700 dark:text-slate-300 list-disc list-inside">
+              <!-- Populated dynamically -->
+            </ul>
+          </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- VIEW 3: WEAKNESS & PROBLEM AREAS DASHBOARD                -->
+        <!-- ========================================================= -->
+        <section id="diagnosticsView" class="hidden space-y-6">
+          <!-- Top Summary Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Questions Attempted</p>
+              <p id="statTotalAttempted" class="text-3xl font-extrabold mt-1">0</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Across all 6 modules</p>
+            </div>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Overall Accuracy</p>
+              <p id="statOverallAccuracy" class="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-1">—</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Target mastery: ≥ 80%</p>
+            </div>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Identified Weak Areas</p>
+              <p id="statWeakCount" class="text-3xl font-extrabold text-rose-600 dark:text-rose-400 mt-1">0</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Topics below 70% accuracy</p>
+            </div>
+          </div>
+
+          <!-- Adaptive Diagnosis & Action Banner -->
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200 dark:border-slate-800">
+              <div>
+                <h2 class="text-lg sm:text-xl font-bold">Adaptive Weakness Diagnosis</h2>
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                  Real-time breakdown of your performance and specific concept errors.
+                </p>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <button id="diagDrillBtn" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-semibold shadow-sm transition-all">
+                  Start Weakness Drill
+                </button>
+                <button id="resetStatsBtn" class="px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold transition-all">
+                  Reset Progress
+                </button>
+              </div>
+            </div>
+
+            <!-- Reset Confirmation Inline Banner (Replaces native confirm) -->
+            <div id="resetConfirmBanner" class="hidden mt-4 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <p class="text-xs sm:text-sm font-medium text-rose-800 dark:text-rose-200">
+                Are you sure you want to clear all practice history, streaks, and mistake logs?
+              </p>
+              <div class="flex items-center gap-2">
+                <button id="confirmResetYesBtn" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold">
+                  Yes, Reset Everything
+                </button>
+                <button id="confirmResetNoBtn" class="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-xs font-semibold">
+                  Cancel
+                </button>
+              </div>
+            </div>
+
+            <!-- Topic Mastery Breakdown Bars -->
+            <div id="topicBreakdownList" class="mt-6 space-y-4">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Recurring Mistake Patterns Log -->
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
+            <h3 class="text-base font-bold mb-1">Detected Mistake Patterns</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
+              When you miss a question, AlgebraLab logs the exact algebraic concept involved so you can fix root habits.
+            </p>
+            <div id="mistakePatternsContainer" class="space-y-2.5">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    /**
+     * AlgebraLab — College Algebra Study, Practice & Adaptive Diagnosis Engine
+     * Single-file self-contained application with procedural problem generators,
+     * step-by-step hints, full worked solutions, formula reference sheets, and localStorage telemetry.
+     */
+    (function () {
+      // =========================================================================
+      // 1. HELPER FUNCTIONS FOR MATH FORMATTING & RANDOMIZATION
+      // =========================================================================
+      function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function randNonZero(min, max) {
+        let n = 0;
+        while (n === 0) n = randInt(min, max);
+        return n;
+      }
+
+      function shuffle(arr) {
+        const copy = [...arr];
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      }
+
+      function gcd(a, b) {
+        a = Math.abs(a);
+        b = Math.abs(b);
+        while (b) {
+          [a, b] = [b, a % b];
+        }
+        return a || 1;
+      }
+
+      function formatFracHTML(num, den) {
+        if (den < 0) {
+          num = -num;
+          den = -den;
+        }
+        const g = gcd(num, den);
+        num /= g;
+        den /= g;
+        if (den === 1) return `${num}`;
+        return `<span class="frac"><span>${num}</span><span>${den}</span></span>`;
+      }
+
+      function formatFracText(num, den) {
+        if (den < 0) {
+          num = -num;
+          den = -den;
+        }
+        const g = gcd(num, den);
+        num /= g;
+        den /= g;
+        if (den === 1) return `${num}`;
+        return `${num}/${den}`;
+      }
+
+      function formatTerm(coeff, variable = '', isFirst = false) {
+        if (coeff === 0) return '';
+        const sign = coeff < 0 ? (isFirst ? '-' : ' - ') : (isFirst ? '' : ' + ');
+        const absVal = Math.abs(coeff);
+        const numStr = (absVal === 1 && variable !== '') ? '' : `${absVal}`;
+        return `${sign}${numStr}${variable}`;
+      }
+
+      function normalizeAnswer(str) {
+        return String(str)
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, '')
+          .replace(/x=/g, '')
+          .replace(/y=/g, '')
+          .replace(/−/g, '-');
+      }
+
+      // =========================================================================
+      // 2. CURRICULUM MODULES, STUDY GUIDES & PROCEDURAL PROBLEM GENERATORS
+      // =========================================================================
+      const MODULES = [
+        {
+          id: 'linear',
+          name: 'Linear Equations & Inequalities',
+          shortName: 'Linear & Inequalities',
+          icon: '📏',
+          summary: 'Solving multi-step linear equations, fractional equations, absolute value equations, and compound inequalities.',
+          formulas: [
+            {
+              title: 'Slope-Intercept Form',
+              formula: 'y = mx + b',
+              desc: 'm is the slope (rise/run) and (0, b) is the y-intercept.'
+            },
+            {
+              title: 'Point-Slope Form',
+              formula: 'y - y<sub>1</sub> = m(x - x<sub>1</sub>)',
+              desc: 'Use when given a slope m and any point (x₁, y₁) on the line.'
+            },
+            {
+              title: 'Inequality Sign Flip Rule',
+              formula: 'If a &lt; b and c &lt; 0, then ac &gt; bc',
+              desc: 'Always reverse the inequality symbol when multiplying or dividing both sides by a negative number.'
+            },
+            {
+              title: 'Absolute Value Equations',
+              formula: '|u| = k  ⇒  u = k  or  u = -k',
+              desc: 'Isolate the absolute value expression first before splitting into two cases (k ≥ 0).'
+            }
+          ],
+          pitfalls: [
+            'Forgetting to flip the inequality sign (< to >) when dividing by a negative coefficient.',
+            'Distributing a negative sign across parentheses: -(2x - 5) becomes -2x + 5, not -2x - 5.',
+            'Splitting an absolute value equation before isolating the |...| bars on one side.'
+          ],
+          generateProblem() {
+            const variant = randInt(1, 3);
+            if (variant === 1) {
+              // Multi-step linear equation: a(bx + c) + d = ex + f
+              const x = randNonZero(-8, 9);
+              const a = randNonZero(-4, 5);
+              const b = randInt(1, 3);
+              const c = randNonZero(-6, 6);
+              const d = randNonZero(-9, 9);
+              const e = randNonZero(-5, 6);
+              // Ensure a*b !== e so there's a unique solution
+              const adjE = (a * b === e) ? e + 2 : e;
+              const f = a * (b * x + c) + d - adjE * x;
+
+              const leftExpr = `${a === 1 ? '' : a === -1 ? '-' : a}(${formatTerm(b, 'x', true)}${formatTerm(c, '', false)})${formatTerm(d, '', false)}`;
+              const rightExpr = `${formatTerm(adjE, 'x', true)}${formatTerm(f, '', false)}`;
+
+              const wrongSign = -x;
+              const wrongDist = x + c;
+              const wrongCombine = x + (a * b > 0 ? 2 : -2);
+
+              return {
+                skill: 'Multi-Step Linear Equations',
+                mistakeTag: 'Distribution & Sign Errors in Linear Equations',
+                prompt: 'Solve the linear equation for x:',
+                expressionHTML: `${leftExpr} = ${rightExpr}`,
+                correctDisplay: `x = ${x}`,
+                acceptableInputs: [`${x}`, `x=${x}`],
+                inputHint: 'Enter an integer (e.g., 4 or -3)',
+                choices: shuffle([
+                  `x = ${x}`,
+                  `x = ${wrongSign}`,
+                  `x = ${wrongDist}`,
+                  `x = ${wrongCombine === x ? x + 3 : wrongCombine}`
+                ]),
+                hints: [
+                  `Start by distributing ${a} into (${formatTerm(b, 'x', true)}${formatTerm(c, '', false)}). Watch the signs!`,
+                  `After distributing and combining constants on the left, move all x-terms to one side and constants to the other.`
+                ],
+                steps: [
+                  `Distribute ${a}: ${formatTerm(a * b, 'x', true)}${formatTerm(a * c, '', false)}${formatTerm(d, '', false)} = ${rightExpr}`,
+                  `Combine like terms on the left: ${formatTerm(a * b, 'x', true)}${formatTerm(a * c + d, '', false)} = ${rightExpr}`,
+                  `Collect x-terms on one side: ${(a * b - adjE)}x = ${f - (a * c + d)}`,
+                  `Divide by ${(a * b - adjE)} to get x = ${x}.`
+                ]
+              };
+            } else if (variant === 2) {
+              // Linear Inequality with negative division: -ax + b > c
+              const a = randInt(2, 6);
+              const xBound = randNonZero(-7, 7);
+              const b = randNonZero(-10, 10);
+              const c = -a * xBound + b;
+              // -a*x + b < c  =>  -a*x < c - b  =>  x > xBound
+              const correctStr = `x > ${xBound}`;
+              return {
+                skill: 'Linear Inequalities',
+                mistakeTag: 'Forgetting to Flip Inequality Sign on Negative Division',
+                prompt: 'Solve the inequality for x:',
+                expressionHTML: `-${a}x${formatTerm(b, '', false)} &lt; ${c}`,
+                correctDisplay: correctStr,
+                acceptableInputs: [`x>${xBound}`],
+                inputHint: 'Example format: x > 3',
+                choices: shuffle([
+                  `x > ${xBound}`,
+                  `x < ${xBound}`,
+                  `x > ${-xBound}`,
+                  `x < ${-xBound}`
+                ]),
+                hints: [
+                  `Subtract ${b} from both sides first to isolate -${a}x.`,
+                  `Remember: when you divide both sides by -${a} (a negative number), the inequality sign must reverse direction.`
+                ],
+                steps: [
+                  `Subtract ${b} from both sides: -${a}x < ${c - b}`,
+                  `Divide both sides by -${a} and flip the '<' sign to '>': x > ${formatFracText(c - b, -a)}`,
+                  `Simplify to get x > ${xBound}.`
+                ]
+              };
+            } else {
+              // Absolute value equation: |x - h| + k = m
+              const h = randNonZero(-6, 6);
+              const dist = randInt(2, 7);
+              const k = randInt(1, 6);
+              const m = dist + k;
+              const sol1 = h + dist;
+              const sol2 = h - dist;
+              const sorted = [sol1, sol2].sort((p, q) => p - q);
+              const ansStr = `${sorted[0]}, ${sorted[1]}`;
+
+              return {
+                skill: 'Absolute Value Equations',
+                mistakeTag: 'Missing the Second Case in Absolute Value Equations',
+                prompt: 'Find both solutions for x (enter smaller value first, separated by a comma):',
+                expressionHTML: `|x${formatTerm(-h, '', false)}| + ${k} = ${m}`,
+                correctDisplay: `x = ${ansStr}`,
+                acceptableInputs: [`${sorted[0]},${sorted[1]}`, `${sorted[1]},${sorted[0]}`],
+                inputHint: 'Example: -2, 8',
+                choices: shuffle([
+                  `x = ${sorted[0]}, ${sorted[1]}`,
+                  `x = ${sol1} only`,
+                  `x = ${-sorted[1]}, ${-sorted[0]}`,
+                  `x = ${h - m}, ${h + m}`
+                ]),
+                hints: [
+                  `Isolate the absolute value bars first by subtracting ${k} from both sides.`,
+                  `Once you have |x${formatTerm(-h, '', false)}| = ${dist}, split into two equations: x${formatTerm(-h, '', false)} = ${dist} and x${formatTerm(-h, '', false)} = -${dist}.`
+                ],
+                steps: [
+                  `Subtract ${k} from both sides: |x${formatTerm(-h, '', false)}| = ${dist}`,
+                  `Case 1: x${formatTerm(-h, '', false)} = ${dist}  ⇒  x = ${sol1}`,
+                  `Case 2: x${formatTerm(-h, '', false)} = -${dist}  ⇒  x = ${sol2}`,
+                  `Solution set: {${sorted[0]}, ${sorted[1]}}.`
+                ]
+              };
+            }
+          }
+        },
+        {
+          id: 'functions',
+          name: 'Functions, Domain & Range',
+          shortName: 'Functions & Domain',
+          icon: '📈',
+          summary: 'Evaluating functions, function composition (f ∘ g)(x), difference quotients, and finding domain restrictions.',
+          formulas: [
+            {
+              title: 'Function Composition',
+              formula: '(f ∘ g)(x) = f(g(x))',
+              desc: 'Evaluate the inner function g(x) first, then substitute that expression into f.'
+            },
+            {
+              title: 'Radical Domain Restriction',
+              formula: 'f(x) = <span class="sqrt">√<span class="sqrt-radicand">u(x)</span></span>  ⇒  u(x) ≥ 0',
+              desc: 'Even roots require a non-negative radicand in the real number system.'
+            },
+            {
+              title: 'Rational Domain Restriction',
+              formula: 'f(x) = <span class="frac"><span>N(x)</span><span>D(x)</span></span>  ⇒  D(x) ≠ 0',
+              desc: 'Exclude any x-values that make the denominator equal to zero.'
+            },
+            {
+              title: 'Average Rate of Change',
+              formula: '<span class="frac"><span>f(b) - f(a)</span><span>b - a</span></span>',
+              desc: 'Measures the slope of the secant line connecting (a, f(a)) and (b, f(b)).'
+            }
+          ],
+          pitfalls: [
+            'Confusing f(g(x)) with multiplication f(x) · g(x).',
+            'Using strict inequality (>) instead of (≥) for square roots in the numerator.',
+            'Forgetting that a square root in the denominator requires strict inequality (> 0).'
+          ],
+          generateProblem() {
+            const variant = randInt(1, 3);
+            if (variant === 1) {
+              // Function evaluation of quadratic: f(x) = ax^2 + bx + c, find f(k)
+              const a = randNonZero(-3, 4);
+              const b = randNonZero(-5, 5);
+              const c = randNonZero(-8, 8);
+              const k = randNonZero(-4, 4);
+              const ans = a * k * k + b * k + c;
+              // Common sign mistake: forgetting (-k)^2 is positive
+              const signMistake = a * (-k * k) + b * k + c;
+
+              return {
+                skill: 'Function Evaluation',
+                mistakeTag: 'Sign Errors When Squaring Negative Inputs in f(x)',
+                prompt: `Given f(x) = ${formatTerm(a, 'x<sup>2</sup>', true)}${formatTerm(b, 'x', false)}${formatTerm(c, '', false)}, evaluate f(${k}):`,
+                expressionHTML: `f(${k}) = ?`,
+                correctDisplay: `${ans}`,
+                acceptableInputs: [`${ans}`],
+                inputHint: 'Enter a single integer',
+                choices: shuffle([
+                  `${ans}`,
+                  `${signMistake === ans ? ans + 4 : signMistake}`,
+                  `${ans - 2 * b * k}`,
+                  `${a * k + b * k + c}`
+                ]),
+                hints: [
+                  `Substitute (${k}) in place of every x in the function definition.`,
+                  `Remember PEMDAS: square (${k}) first to get ${k * k}, then multiply by ${a}.`
+                ],
+                steps: [
+                  `Substitute x = ${k}: f(${k}) = ${a}(${k})² + (${b})(${k}) + (${c})`,
+                  `Evaluate the exponent: (${k})² = ${k * k}`,
+                  `Multiply: ${a}(${k * k}) + ${b * k} + ${c} = ${a * k * k} + ${b * k} + ${c}`,
+                  `Combine terms to get ${ans}.`
+                ]
+              };
+            } else if (variant === 2) {
+              // Domain of radical function: f(x) = sqrt(ax - b)
+              const a = randInt(2, 5);
+              const root = randNonZero(-6, 6);
+              const b = a * root;
+              const ansStr = `[${root}, ∞)`;
+              return {
+                skill: 'Domain of Radical Functions',
+                mistakeTag: 'Domain Restrictions & Interval Notation',
+                prompt: 'Find the domain of the function in interval notation:',
+                expressionHTML: `f(x) = <span class="sqrt">√<span class="sqrt-radicand">${a}x${formatTerm(-b, '', false)}</span></span>`,
+                correctDisplay: ansStr,
+                acceptableInputs: [`[${root},infinity)`, `[${root},inf)`, `[${root},∞)`],
+                inputHint: 'Example: [3, infinity)',
+                choices: shuffle([
+                  `[${root}, ∞)`,
+                  `(${root}, ∞)`,
+                  `(-∞, ${root}]`,
+                  `(-∞, ${root}) ∪ (${root}, ∞)`
+                ]),
+                hints: [
+                  `The expression inside an even square root must be greater than or equal to 0.`,
+                  `Set ${a}x${formatTerm(-b, '', false)} ≥ 0 and solve for x.`
+                ],
+                steps: [
+                  `Set the radicand ≥ 0: ${a}x${formatTerm(-b, '', false)} ≥ 0`,
+                  `Add ${b} to both sides: ${a}x ≥ ${b}`,
+                  `Divide by ${a}: x ≥ ${root}`,
+                  `In interval notation, including ${root} uses a bracket: [${root}, ∞).`
+                ]
+              };
+            } else {
+              // Composition f(g(k))
+              const m = randNonZero(-3, 4);
+              const b = randNonZero(-5, 5);
+              const k = randNonZero(-3, 4);
+              const inner = m * k + b; // g(k)
+              const outer = inner * inner - 3; // f(x) = x^2 - 3
+              const reverseComp = m * (k * k - 3) + b;
+
+              return {
+                skill: 'Function Composition',
+                mistakeTag: 'Reversing Order in Composition (f ∘ g)(x)',
+                prompt: `Let f(x) = x<sup>2</sup> - 3 and g(x) = ${formatTerm(m, 'x', true)}${formatTerm(b, '', false)}. Find (f ∘ g)(${k}):`,
+                expressionHTML: `(f ∘ g)(${k}) = f(g(${k}))`,
+                correctDisplay: `${outer}`,
+                acceptableInputs: [`${outer}`],
+                inputHint: 'Enter an integer',
+                choices: shuffle([
+                  `${outer}`,
+                  `${reverseComp === outer ? outer + 5 : reverseComp}`,
+                  `${inner}`,
+                  `${outer + 6}`
+                ]),
+                hints: [
+                  `Work from the inside out: first calculate g(${k}) using g(x) = ${formatTerm(m, 'x', true)}${formatTerm(b, '', false)}.`,
+                  `Take the result of g(${k}) and plug it into f(x) = x² - 3.`
+                ],
+                steps: [
+                  `Evaluate the inner function: g(${k}) = ${m}(${k}) + (${b}) = ${inner}`,
+                  `Substitute ${inner} into f(x): f(${inner}) = (${inner})² - 3`,
+                  `Calculate: ${inner * inner} - 3 = ${outer}.`
+                ]
+              };
+            }
+          }
+        },
+        {
+          id: 'quadratics',
+          name: 'Quadratic Equations & Parabolas',
+          shortName: 'Quadratics & Parabolas',
+          icon: '🏹',
+          summary: 'Factoring quadratics, applying the quadratic formula, analyzing the discriminant, and finding parabola vertices.',
+          formulas: [
+            {
+              title: 'Quadratic Formula',
+              formula: 'x = <span class="frac"><span>-b ± <span class="sqrt">√<span class="sqrt-radicand">b<sup>2</sup> - 4ac</span></span></span><span>2a</span></span>',
+              desc: 'Solves ax² + bx + c = 0 for any real or complex roots.'
+            },
+            {
+              title: 'Vertex Formula (Standard Form)',
+              formula: 'h = -<span class="frac"><span>b</span><span>2a</span></span>, &nbsp; k = f(h)',
+              desc: 'Gives the vertex (h, k) and axis of symmetry x = h for f(x) = ax² + bx + c.'
+            },
+            {
+              title: 'Vertex Form of a Parabola',
+              formula: 'f(x) = a(x - h)<sup>2</sup> + k',
+              desc: 'Vertex is (h, k). Opens upward if a > 0, downward if a < 0.'
+            },
+            {
+              title: 'Discriminant (Δ = b² - 4ac)',
+              formula: 'Δ &gt; 0: 2 real &nbsp;|&nbsp; Δ = 0: 1 real &nbsp;|&nbsp; Δ &lt; 0: 2 complex',
+              desc: 'Determines the number and type of solutions without solving completely.'
+            }
+          ],
+          pitfalls: [
+            'Forgetting to set the quadratic equation equal to 0 before factoring or identifying a, b, and c.',
+            'Sign error in vertex x-coordinate: h = -b/(2a), not +b/(2a).',
+            'In vertex form a(x - h)² + k, (x + 3)² means h = -3, not +3.'
+          ],
+          generateProblem() {
+            const variant = randInt(1, 3);
+            if (variant === 1) {
+              // Solve factorable quadratic: (x - r1)(x - r2) = 0
+              const r1 = randNonZero(-7, 7);
+              let r2 = randNonZero(-7, 7);
+              if (r2 === r1) r2 += 2;
+              const b = -(r1 + r2);
+              const c = r1 * r2;
+              const sorted = [r1, r2].sort((a, b) => a - b);
+              const ansStr = `${sorted[0]}, ${sorted[1]}`;
+
+              return {
+                skill: 'Factoring Quadratics',
+                mistakeTag: 'Factoring Sign Reversal Errors',
+                prompt: 'Solve the quadratic equation (list roots from smallest to largest):',
+                expressionHTML: `x<sup>2</sup>${formatTerm(b, 'x', false)}${formatTerm(c, '', false)} = 0`,
+                correctDisplay: `x = ${ansStr}`,
+                acceptableInputs: [`${sorted[0]},${sorted[1]}`, `${sorted[1]},${sorted[0]}`],
+                inputHint: 'Example: -4, 3',
+                choices: shuffle([
+                  `x = ${sorted[0]}, ${sorted[1]}`,
+                  `x = ${-sorted[1]}, ${-sorted[0]}`,
+                  `x = ${r1}, ${-r2}`,
+                  `x = ${b}, ${c}`
+                ]),
+                hints: [
+                  `Find two integers that multiply to ${c} and add up to ${b}.`,
+                  `Once factored as (x - p)(x - q) = 0, set each factor equal to zero so the signs flip.`
+                ],
+                steps: [
+                  `Find two numbers multiplying to ${c} and adding to ${b}: they are ${-r1} and ${-r2}.`,
+                  `Write in factored form: (x${formatTerm(-r1, '', false)})(x${formatTerm(-r2, '', false)}) = 0`,
+                  `Apply the Zero Product Property: x = ${sorted[0]} or x = ${sorted[1]}.`
+                ]
+              };
+            } else if (variant === 2) {
+              // Vertex of parabola f(x) = a x^2 + b x + c
+              const a = randNonZero(-3, 3);
+              const h = randNonZero(-5, 5);
+              const k = randNonZero(-8, 8);
+              // f(x) = a(x - h)^2 + k = ax^2 - 2ahx + (ah^2 + k)
+              const b = -2 * a * h;
+              const c = a * h * h + k;
+              const ansStr = `(${h}, ${k})`;
+
+              return {
+                skill: 'Vertex of a Parabola',
+                mistakeTag: 'Vertex Formula h = -b/(2a) Sign Error',
+                prompt: 'Find the vertex (h, k) of the quadratic function:',
+                expressionHTML: `f(x) = ${formatTerm(a, 'x<sup>2</sup>', true)}${formatTerm(b, 'x', false)}${formatTerm(c, '', false)}`,
+                correctDisplay: ansStr,
+                acceptableInputs: [`(${h},${k})`, `${h},${k}`],
+                inputHint: 'Format: (h, k)',
+                choices: shuffle([
+                  `(${h}, ${k})`,
+                  `(${-h}, ${k})`,
+                  `(${h}, ${-k})`,
+                  `(${b}, ${c})`
+                ]),
+                hints: [
+                  `Use the vertex formula h = -b / (2a) with a = ${a} and b = ${b}.`,
+                  `After finding h = ${h}, plug x = ${h} back into f(x) to calculate k.`
+                ],
+                steps: [
+                  `Identify coefficients: a = ${a}, b = ${b}, c = ${c}.`,
+                  `Calculate h = -(${b}) / (2 · ${a}) = ${-b} / ${2 * a} = ${h}.`,
+                  `Substitute x = ${h} into f(x): k = ${a}(${h})² + (${b})(${h}) + (${c}) = ${k}.`,
+                  `The vertex is (${h}, ${k}).`
+                ]
+              };
+            } else {
+              // Discriminant analysis
+              const a = randInt(1, 4);
+              const b = randNonZero(-7, 7);
+              const c = randNonZero(-6, 8);
+              const disc = b * b - 4 * a * c;
+              const nature = disc > 0 ? '2 distinct real solutions' : disc === 0 ? '1 repeated real solution' : '2 complex (non-real) solutions';
+
+              return {
+                skill: 'Discriminant Analysis',
+                mistakeTag: 'Discriminant b² - 4ac Calculation Errors',
+                prompt: 'Calculate the discriminant (Δ = b² - 4ac) and determine the nature of the roots:',
+                expressionHTML: `${formatTerm(a, 'x<sup>2</sup>', true)}${formatTerm(b, 'x', false)}${formatTerm(c, '', false)} = 0`,
+                correctDisplay: `Δ = ${disc} (${nature})`,
+                acceptableInputs: [`${disc}`],
+                inputHint: 'Enter the discriminant integer value',
+                choices: shuffle([
+                  `Δ = ${disc} (${nature})`,
+                  `Δ = ${-b * b - 4 * a * c} (2 complex (non-real) solutions)`,
+                  `Δ = ${b * b + 4 * a * c} (2 distinct real solutions)`,
+                  `Δ = ${disc + 8} (2 distinct real solutions)`
+                ]),
+                hints: [
+                  `Compute Δ = b² - 4ac using a = ${a}, b = ${b}, and c = ${c}.`,
+                  `Remember that b² is always non-negative: (${b})² = ${b * b}.`
+                ],
+                steps: [
+                  `Substitute into Δ = b² - 4ac: Δ = (${b})² - 4(${a})(${c})`,
+                  `Simplify: Δ = ${b * b} - (${4 * a * c}) = ${disc}`,
+                  `Since Δ ${disc > 0 ? '> 0' : disc === 0 ? '= 0' : '< 0'}, there are ${nature}.`
+                ]
+              };
+            }
+          }
+        },
+        {
+          id: 'polynomials',
+          name: 'Polynomial & Rational Functions',
+          shortName: 'Polynomials & Rational',
+          icon: '〰️',
+          summary: 'End behavior, zeros & multiplicity, Remainder Theorem, and vertical/horizontal asymptotes of rational functions.',
+          formulas: [
+            {
+              title: 'Horizontal Asymptote Rules (N(x)/D(x))',
+              formula: 'deg(N) &lt; deg(D): y = 0 &nbsp;|&nbsp; deg(N) = deg(D): y = <span class="frac"><span>a<sub>n</sub></span><span>b<sub>m</sub></span></span>',
+              desc: 'Compare the highest degree of the numerator and denominator.'
+            },
+            {
+              title: 'Vertical Asymptotes',
+              formula: 'D(x) = 0 (after simplifying common factors)',
+              desc: 'Factors that cancel out create removable discontinuities (holes), not asymptotes.'
+            },
+            {
+              title: 'Remainder Theorem',
+              formula: 'Remainder of P(x) ÷ (x - c) is P(c)',
+              desc: 'If P(c) = 0, then (x - c) is a factor of P(x).'
+            },
+            {
+              title: 'Zero Multiplicity Behavior',
+              formula: 'Odd multiplicity: crosses x-axis &nbsp;|&nbsp; Even: touches & turns',
+              desc: 'Look at the exponent on each factor (x - r)ᵏ.'
+            }
+          ],
+          pitfalls: [
+            'Setting the numerator equal to zero instead of the denominator when finding vertical asymptotes.',
+            'Forgetting to check if a factor cancels out (which creates a hole instead of a vertical asymptote).',
+            'Evaluating P(-c) instead of P(c) when dividing by (x - c).'
+          ],
+          generateProblem() {
+            const variant = randInt(1, 3);
+            if (variant === 1) {
+              // Horizontal asymptote of rational function (ax^2 + bx + c)/(dx^2 + ex + f)
+              const a = randNonZero(-6, 6);
+              const d = randInt(2, 5);
+              // Make divisible for clean integer answer
+              const ratio = randNonZero(-4, 4);
+              const cleanA = ratio * d;
+              const b = randNonZero(-7, 7);
+              const e = randNonZero(-7, 7);
+
+              return {
+                skill: 'Horizontal Asymptotes',
+                mistakeTag: 'Leading Coefficient Ratio in Horizontal Asymptotes',
+                prompt: 'Find the equation of the horizontal asymptote of the rational function:',
+                expressionHTML: `R(x) = <span class="frac"><span>${formatTerm(cleanA, 'x<sup>2</sup>', true)}${formatTerm(b, 'x', false)} + 1</span><span>${formatTerm(d, 'x<sup>2</sup>', true)}${formatTerm(e, 'x', false)} - 4</span></span>`,
+                correctDisplay: `y = ${ratio}`,
+                acceptableInputs: [`y=${ratio}`, `${ratio}`],
+                inputHint: 'Format: y = 2',
+                choices: shuffle([
+                  `y = ${ratio}`,
+                  `y = 0`,
+                  `x = ${ratio}`,
+                  `y = ${-ratio}`
+                ]),
+                hints: [
+                  `Compare the degree of the numerator (2) with the degree of the denominator (2).`,
+                  `When the degrees are equal, the horizontal asymptote is y = (leading coefficient of top) / (leading coefficient of bottom).`
+                ],
+                steps: [
+                  `Both numerator and denominator have degree 2.`,
+                  `Divide the leading coefficients: y = ${cleanA} / ${d}`,
+                  `Simplify to get the horizontal asymptote y = ${ratio}.`
+                ]
+              };
+            } else if (variant === 2) {
+              // Vertical asymptote (with one removable hole!)
+              const hole = randNonZero(-5, 5);
+              let va = randNonZero(-6, 6);
+              if (va === hole) va += 2;
+
+              return {
+                skill: 'Vertical Asymptotes vs. Holes',
+                mistakeTag: 'Confusing Removable Holes with Vertical Asymptotes',
+                prompt: 'Identify the vertical asymptote of the rational function (watch for common factors!):',
+                expressionHTML: `f(x) = <span class="frac"><span>(x${formatTerm(-hole, '', false)})(x + 2)</span><span>(x${formatTerm(-hole, '', false)})(x${formatTerm(-va, '', false)})</span></span>`,
+                correctDisplay: `x = ${va}`,
+                acceptableInputs: [`x=${va}`, `${va}`],
+                inputHint: 'Format: x = 4',
+                choices: shuffle([
+                  `x = ${va}`,
+                  `x = ${hole}`,
+                  `x = ${va} and x = ${hole}`,
+                  `x = -2`
+                ]),
+                hints: [
+                  `Simplify the rational expression first by canceling any identical factor in both top and bottom.`,
+                  `Canceled factors create a hole; remaining denominator zeros create vertical asymptotes.`
+                ],
+                steps: [
+                  `Notice (x${formatTerm(-hole, '', false)}) appears in both numerator and denominator, so x = ${hole} is a hole.`,
+                  `After canceling, the simplified function is (x + 2) / (x${formatTerm(-va, '', false)}).`,
+                  `Set the remaining denominator to 0: x${formatTerm(-va, '', false)} = 0  ⇒  x = ${va}.`
+                ]
+              };
+            } else {
+              // Remainder Theorem: Remainder when P(x) = x^3 + ax^2 + bx + c is divided by (x - k)
+              const k = randNonZero(-3, 3);
+              const a = randNonZero(-4, 4);
+              const b = randNonZero(-5, 5);
+              const c = randNonZero(-6, 6);
+              const rem = Math.pow(k, 3) + a * Math.pow(k, 2) + b * k + c;
+              const wrongSignRem = Math.pow(-k, 3) + a * Math.pow(-k, 2) + b * (-k) + c;
+
+              return {
+                skill: 'Polynomial Remainder Theorem',
+                mistakeTag: 'Sign Error in Remainder Theorem P(c) vs P(-c)',
+                prompt: `Use the Remainder Theorem to find the remainder when P(x) is divided by (x${formatTerm(-k, '', false)}):`,
+                expressionHTML: `P(x) = x<sup>3</sup>${formatTerm(a, 'x<sup>2</sup>', false)}${formatTerm(b, 'x', false)}${formatTerm(c, '', false)}`,
+                correctDisplay: `${rem}`,
+                acceptableInputs: [`${rem}`],
+                inputHint: 'Enter an integer',
+                choices: shuffle([
+                  `${rem}`,
+                  `${wrongSignRem === rem ? rem + 6 : wrongSignRem}`,
+                  `${rem - c}`,
+                  `${a + b + c}`
+                ]),
+                hints: [
+                  `By the Remainder Theorem, dividing P(x) by (x - c) leaves a remainder equal to P(c).`,
+                  `Here (x${formatTerm(-k, '', false)}) means c = ${k}, so evaluate P(${k}).`
+                ],
+                steps: [
+                  `Set divisor to zero: x${formatTerm(-k, '', false)} = 0  ⇒  x = ${k}.`,
+                  `Evaluate P(${k}) = (${k})³ + (${a})(${k})² + (${b})(${k}) + (${c})`,
+                  `Simplify: ${Math.pow(k, 3)} + ${a * Math.pow(k, 2)} + ${b * k} + ${c} = ${rem}.`
+                ]
+              };
+            }
+          }
+        },
+        {
+          id: 'explog',
+          name: 'Exponential & Logarithmic Functions',
+          shortName: 'Exp & Logarithms',
+          icon: '🚀',
+          summary: 'Converting between exponential and log forms, logarithm properties (product, quotient, power), and solving equations.',
+          formulas: [
+            {
+              title: 'Logarithm Definition',
+              formula: 'log<sub>b</sub>(x) = y  ⇔  b<sup>y</sup> = x',
+              desc: 'A logarithm asks: "To what exponent must we raise base b to get x?"'
+            },
+            {
+              title: 'Product & Quotient Rules',
+              formula: 'log<sub>b</sub>(MN) = log<sub>b</sub>M + log<sub>b</sub>N &nbsp;|&nbsp; log<sub>b</sub>(M/N) = log<sub>b</sub>M - log<sub>b</sub>N',
+              desc: 'Multiplication inside becomes addition outside; division becomes subtraction.'
+            },
+            {
+              title: 'Power Rule',
+              formula: 'log<sub>b</sub>(M<sup>p</sup>) = p · log<sub>b</sub>(M)',
+              desc: 'Exponents inside a logarithm move to the front as multipliers.'
+            },
+            {
+              title: 'Change of Base Formula',
+              formula: 'log<sub>b</sub>(x) = <span class="frac"><span>ln(x)</span><span>ln(b)</span></span> = <span class="frac"><span>log(x)</span><span>log(b)</span></span>',
+              desc: 'Useful for evaluating any base logarithm on a scientific calculator.'
+            }
+          ],
+          pitfalls: [
+            'Thinking log(A + B) equals log(A) + log(B). Addition inside a log cannot be split!',
+            'Forgetting to check for extraneous solutions that make the argument inside a log ≤ 0.',
+            'Confusing the base and exponent when rewriting log_b(x) = y into b^y = x.'
+          ],
+          generateProblem() {
+            const variant = randInt(1, 3);
+            if (variant === 1) {
+              // Evaluate exact logarithm: log_b(b^k)
+              const bases = [2, 3, 4, 5];
+              const b = bases[randInt(0, bases.length - 1)];
+              const k = randInt(2, 4);
+              const val = Math.pow(b, k);
+
+              return {
+                skill: 'Evaluating Logarithms',
+                mistakeTag: 'Confusing Logarithms with Division (val / base)',
+                prompt: 'Evaluate the logarithm without a calculator:',
+                expressionHTML: `log<sub>${b}</sub>(${val})`,
+                correctDisplay: `${k}`,
+                acceptableInputs: [`${k}`],
+                inputHint: 'Enter an integer',
+                choices: shuffle([
+                  `${k}`,
+                  `${val / b}`,
+                  `${k + 1}`,
+                  `${b}`
+                ]),
+                hints: [
+                  `Rewrite log<sub>${b}</sub>(${val}) = y in exponential form: ${b}<sup>y</sup> = ${val}.`,
+                  `Ask yourself: how many times do you multiply ${b} by itself to reach ${val}?`
+                ],
+                steps: [
+                  `Set log<sub>${b}</sub>(${val}) = y, which means ${b}<sup>y</sup> = ${val}.`,
+                  `Express ${val} as a power of ${b}: ${val} = ${b}<sup>${k}</sup>.`,
+                  `Therefore, y = ${k}.`
+                ]
+              };
+            } else if (variant === 2) {
+              // Solve exponential equation with matching bases: b^(2x - c) = b^d
+              const b = randInt(2, 5);
+              const x = randNonZero(-3, 5);
+              const c = randInt(1, 6);
+              const expRight = 2 * x - c;
+              // Present right side as b^expRight if expRight in [1..4]
+              const safeX = randInt(2, 4);
+              const safeC = randInt(1, 3);
+              const rightPower = 2 * safeX - safeC;
+              const rightNum = Math.pow(b, rightPower);
+
+              return {
+                skill: 'Exponential Equations (Common Base)',
+                mistakeTag: 'Equating Exponents After Rewriting Base',
+                prompt: 'Solve the exponential equation for x:',
+                expressionHTML: `${b}<sup>2x - ${safeC}</sup> = ${rightNum}`,
+                correctDisplay: `x = ${safeX}`,
+                acceptableInputs: [`${safeX}`, `x=${safeX}`],
+                inputHint: 'Enter an integer',
+                choices: shuffle([
+                  `x = ${safeX}`,
+                  `x = ${rightPower}`,
+                  `x = ${safeX - safeC}`,
+                  `x = ${safeX + 1}`
+                ]),
+                hints: [
+                  `Rewrite ${rightNum} as a power of base ${b}: ${rightNum} = ${b}<sup>${rightPower}</sup>.`,
+                  `Once both sides have the same base ${b}, set their exponents equal: 2x - ${safeC} = ${rightPower}.`
+                ],
+                steps: [
+                  `Rewrite the right side with base ${b}: ${b}<sup>2x - ${safeC}</sup> = ${b}<sup>${rightPower}</sup>`,
+                  `Equate the exponents: 2x - ${safeC} = ${rightPower}`,
+                  `Add ${safeC} to both sides: 2x = ${rightPower + safeC}`,
+                  `Divide by 2: x = ${safeX}.`
+                ]
+              };
+            } else {
+              // Solve logarithmic equation: log_b(x - h) = k
+              const b = randInt(2, 4);
+              const k = randInt(2, 3);
+              const h = randNonZero(-5, 6);
+              const powVal = Math.pow(b, k);
+              const x = powVal + h;
+
+              return {
+                skill: 'Solving Logarithmic Equations',
+                mistakeTag: 'Exponential Conversion Error b^k = argument',
+                prompt: 'Solve the logarithmic equation for x:',
+                expressionHTML: `log<sub>${b}</sub>(x${formatTerm(-h, '', false)}) = ${k}`,
+                correctDisplay: `x = ${x}`,
+                acceptableInputs: [`${x}`, `x=${x}`],
+                inputHint: 'Enter an integer',
+                choices: shuffle([
+                  `x = ${x}`,
+                  `x = ${b * k + h}`,
+                  `x = ${powVal - h}`,
+                  `x = ${Math.pow(k, b) + h}`
+                ]),
+                hints: [
+                  `Convert from logarithmic form log<sub>b</sub>(A) = C into exponential form b<sup>C</sup> = A.`,
+                  `Here, ${b}<sup>${k}</sup> = x${formatTerm(-h, '', false)}.`
+                ],
+                steps: [
+                  `Rewrite in exponential form: x${formatTerm(-h, '', false)} = ${b}<sup>${k}</sup>`,
+                  `Evaluate ${b}<sup>${k}</sup> = ${powVal}: x${formatTerm(-h, '', false)} = ${powVal}`,
+                  `Solve for x: x = ${powVal} + (${h}) = ${x}.`
+                ]
+              };
+            }
+          }
+        },
+        {
+          id: 'systems',
+          name: 'Systems of Equations & Matrices',
+          shortName: 'Systems & Matrices',
+          icon: '🧮',
+          summary: 'Solving 2×2 linear systems via substitution/elimination, 2×2 matrix determinants, and Cramer’s Rule.',
+          formulas: [
+            {
+              title: '2×2 Matrix Determinant',
+              formula: 'det <span class="font-mono">[a b; c d]</span> = ad - bc',
+              desc: 'Multiply the main diagonal (top-left to bottom-right) and subtract the anti-diagonal.'
+            },
+            {
+              title: 'Consistent vs. Inconsistent Systems',
+              formula: '1 solution (intersecting) &nbsp;|&nbsp; 0 solutions (parallel) &nbsp;|&nbsp; ∞ (same line)',
+              desc: 'If variables cancel to 0 = k (k ≠ 0), there is no solution.'
+            },
+            {
+              title: 'Elimination Method',
+              formula: 'Multiply equations so one variable has opposite coefficients, then add.',
+              desc: 'Ideal when both equations are written in standard form Ax + By = C.'
+            },
+            {
+              title: 'Matrix Invertibility',
+              formula: 'A<sup>-1</sup> exists if and only if det(A) ≠ 0',
+              desc: 'A matrix with determinant 0 is called singular and has no inverse.'
+            }
+          ],
+          pitfalls: [
+            'Adding bc instead of subtracting bc when computing a 2×2 determinant (ad - bc).',
+            'Multiplying only the left side of an equation when scaling for elimination—forgetting the constant on the right.',
+            'Mixing up x and y coordinates when writing the final ordered pair (x, y).'
+          ],
+          generateProblem() {
+            const variant = randInt(1, 2);
+            if (variant === 1) {
+              // 2x2 Linear System solved cleanly
+              const x = randNonZero(-5, 6);
+              const y = randNonZero(-5, 6);
+              const a1 = randInt(1, 4);
+              const b1 = randNonZero(-3, 3);
+              const c1 = a1 * x + b1 * y;
+
+              const a2 = randInt(1, 4);
+              const b2 = -b1; // Setup clean elimination on y!
+              const c2 = a2 * x + b2 * y;
+
+              return {
+                skill: '2×2 Systems (Elimination)',
+                mistakeTag: 'Coordinate Swap or Constant Scaling Errors in Systems',
+                prompt: 'Solve the system of linear equations for (x, y):',
+                expressionHTML: `
+                  <div class="inline-block text-left font-mono text-lg sm:text-2xl space-y-1">
+                    <div>${formatTerm(a1, 'x', true)}${formatTerm(b1, 'y', false)} = ${c1}</div>
+                    <div>${formatTerm(a2, 'x', true)}${formatTerm(b2, 'y', false)} = ${c2}</div>
+                  </div>
+                `,
+                correctDisplay: `(${x}, ${y})`,
+                acceptableInputs: [`(${x},${y})`, `${x},${y}`],
+                inputHint: 'Format: (x, y)',
+                choices: shuffle([
+                  `(${x}, ${y})`,
+                  `(${y}, ${x})`,
+                  `(${-x}, ${y})`,
+                  `(${x}, ${-y})`
+                ]),
+                hints: [
+                  `Notice the y-terms (${formatTerm(b1, 'y', true)} and ${formatTerm(b2, 'y', true)}) are already opposites!`,
+                  `Add the two equations straight down to eliminate y and solve for x first.`
+                ],
+                steps: [
+                  `Add the two equations together: (${a1}x + ${a2}x) + (${b1}y + ${b2}y) = ${c1} + ${c2}`,
+                  `Simplify: ${a1 + a2}x = ${c1 + c2}  ⇒  x = ${x}`,
+                  `Substitute x = ${x} into the first equation: ${a1}(${x})${formatTerm(b1, 'y', false)} = ${c1}`,
+                  `Solve for y to get y = ${y}. Solution: (${x}, ${y}).`
+                ]
+              };
+            } else {
+              // 2x2 Matrix Determinant
+              const a = randNonZero(-6, 7);
+              const b = randNonZero(-6, 7);
+              const c = randNonZero(-6, 7);
+              const d = randNonZero(-6, 7);
+              const det = a * d - b * c;
+              const addMistake = a * d + b * c;
+
+              return {
+                skill: '2×2 Matrix Determinants',
+                mistakeTag: 'Adding Instead of Subtracting Anti-Diagonal (ad - bc)',
+                prompt: 'Compute the determinant of the 2×2 matrix:',
+                expressionHTML: `
+                  <div class="inline-flex items-center justify-center gap-3 font-mono text-xl sm:text-2xl">
+                    <span>det</span>
+                    <div class="inline-grid grid-cols-2 gap-x-6 gap-y-2 border-x-2 border-current px-3 py-1 rounded-sm">
+                      <span>${a}</span><span>${b}</span>
+                      <span>${c}</span><span>${d}</span>
+                    </div>
+                  </div>
+                `,
+                correctDisplay: `${det}`,
+                acceptableInputs: [`${det}`],
+                inputHint: 'Enter an integer',
+                choices: shuffle([
+                  `${det}`,
+                  `${addMistake === det ? det + 4 : addMistake}`,
+                  `${b * c - a * d}`,
+                  `${a * b - c * d}`
+                ]),
+                hints: [
+                  `Use the 2×2 determinant formula: det = ad - bc.`,
+                  `Multiply the main diagonal (${a} · ${d}) and subtract the other diagonal (${b} · ${c}).`
+                ],
+                steps: [
+                  `Multiply main diagonal: (${a})(${d}) = ${a * d}`,
+                  `Multiply anti-diagonal: (${b})(${c}) = ${b * c}`,
+                  `Subtract: ${a * d} - (${b * c}) = ${det}.`
+                ]
+              };
+            }
+          }
+        }
+      ];
+
+      // =========================================================================
+      // 3. APPLICATION STATE & LOCALSTORAGE PERSISTENCE
+      // =========================================================================
+      const STORAGE_KEY = 'algebralab_progress_v1';
+
+      function getDefaultStats() {
+        const topics = {};
+        MODULES.forEach((m) => {
+          topics[m.id] = { attempts: 0, correct: 0 };
+        });
+        return {
+          streak: 0,
+          topics,
+          mistakes: {} // { mistakeTag: { count, topicId, topicName } }
+        };
+      }
+
+      function loadStats() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return getDefaultStats();
+          const parsed = JSON.parse(raw);
+          const base = getDefaultStats();
+          return {
+            streak: parsed.streak || 0,
+            topics: { ...base.topics, ...(parsed.topics || {}) },
+            mistakes: parsed.mistakes || {}
+          };
+        } catch (e) {
+          return getDefaultStats();
+        }
+      }
+
+      function saveStats() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+        } catch (e) {
+          // Ignore storage quota errors safely
+        }
+      }
+
+      let stats = loadStats();
+      let activeTab = 'practice'; // 'practice' | 'study' | 'diagnostics'
+      let activeTopicId = MODULES[0].id;
+      let isWeaknessDrillMode = false;
+      let answerMode = 'mc'; // 'mc' | 'input'
+      let currentProblem = null;
+      let currentProblemTopicId = MODULES[0].id;
+      let problemAnswered = false;
+      let revealedHintsCount = 0;
+
+      // =========================================================================
+      // 4. DOM ELEMENT REFERENCES
+      // =========================================================================
+      const topicListEl = document.getElementById('topicList');
+      const weakBadgeEl = document.getElementById('weakBadge');
+      const streakCounterEl = document.getElementById('streakCounter');
+      const overallMasteryTextEl = document.getElementById('overallMasteryText');
+      const overallMasteryBarEl = document.getElementById('overallMasteryBar');
+
+      // Tabs & Views
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const practiceView = document.getElementById('practiceView');
+      const studyView = document.getElementById('studyView');
+      const diagnosticsView = document.getElementById('diagnosticsView');
+
+      // Practice View Elements
+      const practiceModeTag = document.getElementById('practiceModeTag');
+      const problemSkillTag = document.getElementById('problemSkillTag');
+      const activeTopicTitle = document.getElementById('activeTopicTitle');
+      const modeMCBtn = document.getElementById('modeMCBtn');
+      const modeInputBtn = document.getElementById('modeInputBtn');
+      const problemPrompt = document.getElementById('problemPrompt');
+      const problemExpression = document.getElementById('problemExpression');
+      const mcOptionsContainer = document.getElementById('mcOptionsContainer');
+      const directInputContainer = document.getElementById('directInputContainer');
+      const inputFormatHint = document.getElementById('inputFormatHint');
+      const directAnswerInput = document.getElementById('directAnswerInput');
+      const submitDirectBtn = document.getElementById('submitDirectBtn');
+      const hintBtn = document.getElementById('hintBtn');
+      const hintBtnText = document.getElementById('hintBtnText');
+      const nextHintStepBtn = document.getElementById('nextHintStepBtn');
+      const hintBox = document.getElementById('hintBox');
+      const hintContent = document.getElementById('hintContent');
+      const nextProblemBtn = document.getElementById('nextProblemBtn');
+      const openTopicFormulaBtn = document.getElementById('openTopicFormulaBtn');
+      const solutionBox = document.getElementById('solutionBox');
+      const feedbackIcon = document.getElementById('feedbackIcon');
+      const feedbackTitle = document.getElementById('feedbackTitle');
+      const feedbackMistakeNote = document.getElementById('feedbackMistakeNote');
+      const workedStepsList = document.getElementById('workedStepsList');
+
+      // Study View Elements
+      const studyTopicTitle = document.getElementById('studyTopicTitle');
+      const studyTopicSummary = document.getElementById('studyTopicSummary');
+      const formulaCardsGrid = document.getElementById('formulaCardsGrid');
+      const studyPitfallsList = document.getElementById('studyPitfallsList');
+      const practiceThisTopicBtn = document.getElementById('practiceThisTopicBtn');
+
+      // Diagnostics View Elements
+      const statTotalAttempted = document.getElementById('statTotalAttempted');
+      const statOverallAccuracy = document.getElementById('statOverallAccuracy');
+      const statWeakCount = document.getElementById('statWeakCount');
+      const topicBreakdownList = document.getElementById('topicBreakdownList');
+      const mistakePatternsContainer = document.getElementById('mistakePatternsContainer');
+      const diagDrillBtn = document.getElementById('diagDrillBtn');
+      const resetStatsBtn = document.getElementById('resetStatsBtn');
+      const resetConfirmBanner = document.getElementById('resetConfirmBanner');
+      const confirmResetYesBtn = document.getElementById('confirmResetYesBtn');
+      const confirmResetNoBtn = document.getElementById('confirmResetNoBtn');
+
+      // Mobile Sidebar
+      const topicsSidebar = document.getElementById('topicsSidebar');
+      const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+      // =========================================================================
+      // 5. CORE ANALYTICS & WEAKNESS IDENTIFICATION LOGIC
+      // =========================================================================
+      function getTopicAccuracy(topicId) {
+        const t = stats.topics[topicId] || { attempts: 0, correct: 0 };
+        if (t.attempts === 0) return null;
+        return Math.round((t.correct / t.attempts) * 100);
+      }
+
+      function getWeakTopicIds() {
+        const weak = [];
+        MODULES.forEach((m) => {
+          const acc = getTopicAccuracy(m.id);
+          if (acc !== null && acc < 70) {
+            weak.push(m.id);
+          }
+        });
+        return weak;
+      }
+
+      function pickNextDrillTopicId() {
+        // Prioritize topics with < 70% accuracy, weighted toward lowest score; fallback to unattempted or random
+        const scored = MODULES.map((m) => {
+          const t = stats.topics[m.id] || { attempts: 0, correct: 0 };
+          const acc = t.attempts === 0 ? 50 : (t.correct / t.attempts) * 100;
+          return { id: m.id, acc, attempts: t.attempts };
+        });
+
+        const weakOnes = scored.filter((s) => s.attempts > 0 && s.acc < 70);
+        if (weakOnes.length > 0) {
+          weakOnes.sort((a, b) => a.acc - b.acc);
+          // Pick from top 2 weakest topics for variety
+          const pool = weakOnes.slice(0, 2);
+          return pool[randInt(0, pool.length - 1)].id;
+        }
+
+        // If no weak topics yet, pick least practiced topic
+        scored.sort((a, b) => a.attempts - b.attempts);
+        return scored[0].id;
+      }
+
+      // =========================================================================
+      // 6. UI RENDERING FUNCTIONS
+      // =========================================================================
+      function renderSidebarAndMetrics() {
+        streakCounterEl.textContent = stats.streak;
+
+        let totalAttempts = 0;
+        let totalCorrect = 0;
+        const weakIds = getWeakTopicIds();
+
+        // Update weak topics badge on Diagnostics tab
+        if (weakIds.length > 0) {
+          weakBadgeEl.textContent = weakIds.length;
+          weakBadgeEl.classList.remove('hidden');
+        } else {
+          weakBadgeEl.classList.add('hidden');
+        }
+
+        // Render topic buttons
+        topicListEl.innerHTML = '';
+        MODULES.forEach((mod) => {
+          const t = stats.topics[mod.id] || { attempts: 0, correct: 0 };
+          totalAttempts += t.attempts;
+          totalCorrect += t.correct;
+          const acc = getTopicAccuracy(mod.id);
+          const isWeak = acc !== null && acc < 70;
+          const isSelected = !isWeaknessDrillMode && activeTopicId === mod.id;
+
+          const btn = document.createElement('button');
+          btn.className = `w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-center justify-between gap-2 border ${
+            isSelected
+              ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-semibold shadow-2xs'
+              : 'border-transparent hover:bg-slate-100 dark:hover:bg-slate-800/70 text-slate-700 dark:text-slate-300 font-medium'
+          }`;
+
+          let statusPill = '';
+          if (acc === null) {
+            statusPill = `<span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">New</span>`;
+          } else if (isWeak) {
+            statusPill = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400">${acc}%</span>`;
+          } else {
+            statusPill = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">${acc}%</span>`;
+          }
+
+          btn.innerHTML = `
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="text-base flex-shrink-0">${mod.icon}</span>
+              <span class="text-xs sm:text-sm truncate">${mod.shortName}</span>
+            </div>
+            ${statusPill}
+          `;
+
+          btn.addEventListener('click', () => {
+            isWeaknessDrillMode = false;
+            activeTopicId = mod.id;
+            closeMobileSidebar();
+            renderSidebarAndMetrics();
+            if (activeTab === 'study') {
+              renderStudyGuide();
+            } else {
+              switchTab('practice');
+              loadNewProblem();
+            }
+          });
+
+          topicListEl.appendChild(btn);
+        });
+
+        // Overall Mastery Progress Bar
+        const overallPct = totalAttempts === 0 ? 0 : Math.round((totalCorrect / totalAttempts) * 100);
+        overallMasteryTextEl.textContent = `${overallPct}%`;
+        overallMasteryBarEl.style.width = `${overallPct}%`;
+      }
+
+      function loadNewProblem() {
+        problemAnswered = false;
+        revealedHintsCount = 0;
+        hintBox.classList.add('hidden');
+        solutionBox.classList.add('hidden');
+        hintBtnText.textContent = 'Show Step-by-Step Hint';
+        directAnswerInput.value = '';
+        directAnswerInput.disabled = false;
+        submitDirectBtn.disabled = false;
+
+        // Determine topic
+        currentProblemTopicId = isWeaknessDrillMode ? pickNextDrillTopicId() : activeTopicId;
+        const mod = MODULES.find((m) => m.id === currentProblemTopicId) || MODULES[0];
+        currentProblem = mod.generateProblem();
+
+        // Update Header Tags
+        if (isWeaknessDrillMode) {
+          practiceModeTag.textContent = '⚡ Targeted Weakness Drill';
+          practiceModeTag.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300';
+        } else {
+          practiceModeTag.textContent = 'Topic Practice';
+          practiceModeTag.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300';
+        }
+
+        activeTopicTitle.textContent = mod.name;
+        problemSkillTag.textContent = `• ${currentProblem.skill}`;
+        problemPrompt.innerHTML = currentProblem.prompt;
+        problemExpression.innerHTML = currentProblem.expressionHTML;
+        inputFormatHint.textContent = `(${currentProblem.inputHint})`;
+
+        // Render Multiple Choice Options
+        mcOptionsContainer.innerHTML = '';
+        const letters = ['A', 'B', 'C', 'D'];
+        currentProblem.choices.forEach((choiceText, idx) => {
+          const btn = document.createElement('button');
+          btn.className = 'mc-choice-btn text-left p-4 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition-all flex items-center gap-3 font-semibold text-sm sm:text-base';
+          btn.dataset.choice = choiceText;
+          btn.innerHTML = `
+            <span class="w-7 h-7 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xs font-bold text-slate-500 dark:text-slate-400 flex-shrink-0">
+              ${letters[idx]}
+            </span>
+            <span>${choiceText}</span>
+          `;
+          btn.addEventListener('click', () => handleAnswerSubmission(choiceText, btn));
+          mcOptionsContainer.appendChild(btn);
+        });
+
+        updateAnswerModeVisibility();
+      }
+
+      function updateAnswerModeVisibility() {
+        if (answerMode === 'mc') {
+          mcOptionsContainer.classList.remove('hidden');
+          directInputContainer.classList.add('hidden');
+          modeMCBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs transition-all';
+          modeInputBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 transition-all';
+        } else {
+          mcOptionsContainer.classList.add('hidden');
+          directInputContainer.classList.remove('hidden');
+          modeInputBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs transition-all';
+          modeMCBtn.className = 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 transition-all';
+          if (!problemAnswered) directAnswerInput.focus();
+        }
+      }
+
+      function handleAnswerSubmission(userAnswer, clickedBtn = null) {
+        if (problemAnswered) return;
+        problemAnswered = true;
+
+        let isCorrect = false;
+        if (answerMode === 'mc') {
+          isCorrect = userAnswer === currentProblem.correctDisplay;
+        } else {
+          const normUser = normalizeAnswer(userAnswer);
+          isCorrect = currentProblem.acceptableInputs.some((acc) => normalizeAnswer(acc) === normUser);
+        }
+
+        // Update Telemetry Stats
+        const topicStat = stats.topics[currentProblemTopicId];
+        topicStat.attempts += 1;
+        if (isCorrect) {
+          topicStat.correct += 1;
+          stats.streak += 1;
+        } else {
+          stats.streak = 0;
+          const mod = MODULES.find((m) => m.id === currentProblemTopicId);
+          const mTag = currentProblem.mistakeTag;
+          if (!stats.mistakes[mTag]) {
+            stats.mistakes[mTag] = { count: 0, topicId: currentProblemTopicId, topicName: mod.shortName };
+          }
+          stats.mistakes[mTag].count += 1;
+        }
+        saveStats();
+        renderSidebarAndMetrics();
+
+        // Style Multiple Choice Buttons
+        const allChoiceBtns = mcOptionsContainer.querySelectorAll('.mc-choice-btn');
+        allChoiceBtns.forEach((b) => {
+          b.disabled = true;
+          const val = b.dataset.choice;
+          if (val === currentProblem.correctDisplay) {
+            b.className = 'mc-choice-btn text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 flex items-center gap-3 font-bold text-sm sm:text-base';
+          } else if (b === clickedBtn && !isCorrect) {
+            b.className = 'mc-choice-btn text-left p-4 rounded-xl border-2 border-rose-500 bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-200 flex items-center gap-3 font-semibold text-sm sm:text-base';
+          } else {
+            b.classList.add('opacity-50');
+          }
+        });
+
+        directAnswerInput.disabled = true;
+        submitDirectBtn.disabled = true;
+
+        // Render Feedback & Complete Solution
+        solutionBox.classList.remove('hidden');
+        if (isCorrect) {
+          solutionBox.className = 'mt-6 rounded-2xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/70 dark:bg-emerald-950/25 p-5 transition-all';
+          feedbackIcon.className = 'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-base bg-emerald-500 text-white';
+          feedbackIcon.textContent = '✓';
+          feedbackTitle.className = 'font-bold text-base text-emerald-800 dark:text-emerald-300';
+          feedbackTitle.textContent = `Correct! Answer: ${currentProblem.correctDisplay}`;
+          feedbackMistakeNote.className = 'text-xs sm:text-sm mt-1 font-medium text-emerald-700 dark:text-emerald-400';
+          feedbackMistakeNote.textContent = `Great job mastering ${currentProblem.skill}.`;
+        } else {
+          solutionBox.className = 'mt-6 rounded-2xl border border-rose-300 dark:border-rose-800 bg-rose-50/70 dark:bg-rose-950/25 p-5 transition-all';
+          feedbackIcon.className = 'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-base bg-rose-500 text-white';
+          feedbackIcon.textContent = '✕';
+          feedbackTitle.className = 'font-bold text-base text-rose-800 dark:text-rose-300';
+          feedbackTitle.textContent = `Not quite — Correct Answer: ${currentProblem.correctDisplay}`;
+          feedbackMistakeNote.className = 'text-xs sm:text-sm mt-1 font-medium text-rose-700 dark:text-rose-300';
+          feedbackMistakeNote.textContent = `Logged to Problem Areas: ${currentProblem.mistakeTag}`;
+        }
+
+        workedStepsList.innerHTML = '';
+        currentProblem.steps.forEach((stepHTML) => {
+          const li = document.createElement('li');
+          li.innerHTML = stepHTML;
+          workedStepsList.appendChild(li);
+        });
+      }
+
+      function renderStudyGuide() {
+        const mod = MODULES.find((m) => m.id === activeTopicId) || MODULES[0];
+        studyTopicTitle.textContent = `${mod.icon} ${mod.name}`;
+        studyTopicSummary.textContent = mod.summary;
+
+        formulaCardsGrid.innerHTML = '';
+        mod.formulas.forEach((f) => {
+          const card = document.createElement('div');
+          card.className = 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xs flex flex-col justify-between';
+          card.innerHTML = `
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">${f.title}</h3>
+              <div class="my-3 px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 font-semibold text-base sm:text-lg text-center overflow-x-auto">
+                ${f.formula}
+              </div>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">${f.desc}</p>
+          `;
+          formulaCardsGrid.appendChild(card);
+        });
+
+        studyPitfallsList.innerHTML = '';
+        mod.pitfalls.forEach((pitfall) => {
+          const li = document.createElement('li');
+          li.textContent = pitfall;
+          studyPitfallsList.appendChild(li);
+        });
+      }
+
+      function renderDiagnostics() {
+        let totalAttempts = 0;
+        let totalCorrect = 0;
+        const weakIds = getWeakTopicIds();
+
+        topicBreakdownList.innerHTML = '';
+        MODULES.forEach((mod) => {
+          const t = stats.topics[mod.id] || { attempts: 0, correct: 0 };
+          totalAttempts += t.attempts;
+          totalCorrect += t.correct;
+          const acc = getTopicAccuracy(mod.id);
+
+          let barColor = 'bg-slate-300 dark:bg-slate-700';
+          let badgeHTML = '<span class="text-xs font-medium text-slate-400">Not practiced yet</span>';
+
+          if (acc !== null) {
+            if (acc < 70) {
+              barColor = 'bg-rose-500';
+              badgeHTML = `<span class="text-xs font-bold text-rose-600 dark:text-rose-400">${acc}% (${t.correct}/${t.attempts}) • Needs Focus</span>`;
+            } else if (acc < 85) {
+              barColor = 'bg-amber-500';
+              badgeHTML = `<span class="text-xs font-bold text-amber-600 dark:text-amber-400">${acc}% (${t.correct}/${t.attempts}) • Developing</span>`;
+            } else {
+              barColor = 'bg-emerald-500';
+              badgeHTML = `<span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">${acc}% (${t.correct}/${t.attempts}) • Mastered</span>`;
+            }
+          }
+
+          const row = document.createElement('div');
+          row.className = 'p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/70 dark:border-slate-800';
+          row.innerHTML = `
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div class="flex items-center gap-2">
+                <span>${mod.icon}</span>
+                <span class="font-semibold text-sm">${mod.name}</span>
+              </div>
+              <div class="flex items-center gap-3">
+                ${badgeHTML}
+                <button data-practice-id="${mod.id}" class="diag-practice-topic text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                  Practice →
+                </button>
+              </div>
+            </div>
+            <div class="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full ${barColor} rounded-full transition-all duration-300" style="width: ${acc === null ? 0 : acc}%"></div>
+            </div>
+          `;
+          topicBreakdownList.appendChild(row);
+        });
+
+        // Wire quick practice buttons in diagnostics list
+        topicBreakdownList.querySelectorAll('.diag-practice-topic').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            isWeaknessDrillMode = false;
+            activeTopicId = btn.dataset.practiceId;
+            renderSidebarAndMetrics();
+            switchTab('practice');
+            loadNewProblem();
+          });
+        });
+
+        // Summary KPI Cards
+        statTotalAttempted.textContent = totalAttempts;
+        statOverallAccuracy.textContent = totalAttempts === 0 ? '—' : `${Math.round((totalCorrect / totalAttempts) * 100)}%`;
+        statWeakCount.textContent = weakIds.length;
+
+        // Mistake Patterns Log
+        const mistakeEntries = Object.entries(stats.mistakes).sort((a, b) => b[1].count - a[1].count);
+        mistakePatternsContainer.innerHTML = '';
+
+        if (mistakeEntries.length === 0) {
+          mistakePatternsContainer.innerHTML = `
+            <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/70 dark:border-slate-800 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+              No recurring error patterns logged yet. Start solving problems in the Practice Engine—any missed concept will appear here with targeted remediation!
+            </div>
+          `;
+        } else {
+          mistakeEntries.forEach(([tag, info]) => {
+            const item = document.createElement('div');
+            item.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 rounded-xl bg-rose-50/60 dark:bg-rose-950/25 border border-rose-200/80 dark:border-rose-900/50';
+            item.innerHTML = `
+              <div>
+                <p class="text-sm font-semibold text-rose-900 dark:text-rose-200">${tag}</p>
+                <p class="text-xs text-rose-700/80 dark:text-rose-400 mt-0.5">Module: ${info.topicName} • Missed ${info.count} time${info.count > 1 ? 's' : ''}</p>
+              </div>
+              <button data-review-id="${info.topicId}" class="review-mistake-btn self-start sm:self-center px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-rose-300 dark:border-rose-800 text-xs font-semibold text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors">
+                Review Formula Sheet
+              </button>
+            `;
+            mistakePatternsContainer.appendChild(item);
+          });
+
+          mistakePatternsContainer.querySelectorAll('.review-mistake-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              activeTopicId = btn.dataset.reviewId;
+              isWeaknessDrillMode = false;
+              renderSidebarAndMetrics();
+              switchTab('study');
+              renderStudyGuide();
+            });
+          });
+        }
+      }
+
+      // =========================================================================
+      // 7. NAVIGATION & EVENT LISTENERS
+      // =========================================================================
+      function switchTab(tabName) {
+        activeTab = tabName;
+
+        tabBtns.forEach((btn) => {
+          const isTarget = btn.dataset.tab === tabName;
+          btn.className = isTarget
+            ? 'tab-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm flex items-center justify-center gap-1.5'
+            : 'tab-btn flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all flex items-center justify-center gap-1.5';
+        });
+
+        practiceView.classList.toggle('hidden', tabName !== 'practice');
+        studyView.classList.toggle('hidden', tabName !== 'study');
+        diagnosticsView.classList.toggle('hidden', tabName !== 'diagnostics');
+
+        if (tabName === 'study') renderStudyGuide();
+        if (tabName === 'diagnostics') renderDiagnostics();
+      }
+
+      tabBtns.forEach((btn) => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+
+      // Hint Controls
+      hintBtn.addEventListener('click', () => {
+        if (!currentProblem) return;
+        hintBox.classList.remove('hidden');
+        if (revealedHintsCount === 0) revealedHintsCount = 1;
+        renderHints();
+      });
+
+      nextHintStepBtn.addEventListener('click', () => {
+        if (!currentProblem) return;
+        if (revealedHintsCount < currentProblem.hints.length) {
+          revealedHintsCount++;
+          renderHints();
+        }
+      });
+
+      function renderHints() {
+        hintContent.innerHTML = '';
+        for (let i = 0; i < revealedHintsCount; i++) {
+          const p = document.createElement('p');
+          p.innerHTML = `<strong>Hint ${i + 1}:</strong> ${currentProblem.hints[i]}`;
+          hintContent.appendChild(p);
+        }
+
+        if (revealedHintsCount < currentProblem.hints.length) {
+          nextHintStepBtn.classList.remove('hidden');
+          hintBtnText.textContent = `Hint (${revealedHintsCount}/${currentProblem.hints.length})`;
+        } else {
+          nextHintStepBtn.classList.add('hidden');
+          hintBtnText.textContent = 'All Hints Shown';
+        }
+      }
+
+      // Answer Mode & Submission
+      modeMCBtn.addEventListener('click', () => {
+        answerMode = 'mc';
+        updateAnswerModeVisibility();
+      });
+
+      modeInputBtn.addEventListener('click', () => {
+        answerMode = 'input';
+        updateAnswerModeVisibility();
+      });
+
+      submitDirectBtn.addEventListener('click', () => {
+        if (directAnswerInput.value.trim() !== '') {
+          handleAnswerSubmission(directAnswerInput.value);
+        }
+      });
+
+      directAnswerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && directAnswerInput.value.trim() !== '') {
+          handleAnswerSubmission(directAnswerInput.value);
+        }
+      });
+
+      nextProblemBtn.addEventListener('click', loadNewProblem);
+
+      openTopicFormulaBtn.addEventListener('click', () => {
+        activeTopicId = currentProblemTopicId;
+        switchTab('study');
+      });
+
+      practiceThisTopicBtn.addEventListener('click', () => {
+        isWeaknessDrillMode = false;
+        switchTab('practice');
+        loadNewProblem();
+      });
+
+      // Weakness Drill Triggers
+      function startWeaknessDrill() {
+        isWeaknessDrillMode = true;
+        closeMobileSidebar();
+        renderSidebarAndMetrics();
+        switchTab('practice');
+        loadNewProblem();
+      }
+
+      document.getElementById('startWeaknessDrillBtn').addEventListener('click', startWeaknessDrill);
+      diagDrillBtn.addEventListener('click', startWeaknessDrill);
+
+      // Reset Progress Confirmation Flow
+      resetStatsBtn.addEventListener('click', () => {
+        resetConfirmBanner.classList.remove('hidden');
+      });
+
+      confirmResetNoBtn.addEventListener('click', () => {
+        resetConfirmBanner.classList.add('hidden');
+      });
+
+      confirmResetYesBtn.addEventListener('click', () => {
+        stats = getDefaultStats();
+        saveStats();
+        resetConfirmBanner.classList.add('hidden');
+        renderSidebarAndMetrics();
+        renderDiagnostics();
+      });
+
+      // Theme Toggle (Light / Dark)
+      const themeToggleBtn = document.getElementById('themeToggleBtn');
+      themeToggleBtn.addEventListener('click', () => {
+        const htmlEl = document.documentElement;
+        const isDark = htmlEl.classList.toggle('dark');
+        htmlEl.classList.toggle('light', !isDark);
+      });
+
+      // Mobile Sidebar Controls
+      function openMobileSidebar() {
+        topicsSidebar.classList.remove('-translate-x-full');
+        sidebarBackdrop.classList.remove('hidden');
+      }
+
+      function closeMobileSidebar() {
+        topicsSidebar.classList.add('-translate-x-full');
+        sidebarBackdrop.classList.add('hidden');
+      }
+
+      mobileMenuBtn.addEventListener('click', openMobileSidebar);
+      closeSidebarBtn.addEventListener('click', closeMobileSidebar);
+      sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+
+      // Initialize App
+      renderSidebarAndMetrics();
+      loadNewProblem();
+    })();
+  </script>
+</body>
+</html>
